@@ -100,8 +100,8 @@ void Box_lineout::updatePlot() {
     int dx=geomBox.width();
     int dy=geomBox.height();
 
-    vec2f orig=currentBuffer->get_origin();
-    vec2f scal=currentBuffer->get_scale();
+    // vec2f orig=currentBuffer->get_origin();
+    // vec2f scal=currentBuffer->get_scale();
 
     // only finite pixels count (NaN are common: masks, transformations...)
     if (tabWidget->currentIndex()==0) {
@@ -122,8 +122,11 @@ void Box_lineout::updatePlot() {
         QVector <double> xdata(dx);
         QVector <double> ydata(dy);
 
-        for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
-        for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
+        // for (int i=0;i<dx;i++) xdata[i]=(geomBox.x()+i-orig.x())*scal.x();
+        // for (int j=0;j<dy;j++) ydata[j]=(geomBox.y()+j-orig.y())*scal.y();
+        // the same, or the non-linear axes
+        for (int i=0;i<dx;i++) xdata[i]=currentBuffer->to_world(PHYS_X,geomBox.x()+i);
+        for (int j=0;j<dy;j++) ydata[j]=currentBuffer->to_world(PHYS_Y,geomBox.y()+j);
 
         plot->graph(0)->setData(xdata,xd);
         plot->graph(1)->setData(ydata,yd);
@@ -151,7 +154,10 @@ void Box_lineout::updatePlot() {
             }
         }
         double stddev = count>1 ? sqrt(sumsq/(count-1)) : 0.0;
-        double surface = std::abs(dx*dy*scal.x()*scal.y());
+        // double surface = std::abs(dx*dy*scal.x()*scal.y());
+        // the world size of the box: the same with linear axes, exact with non-linear (separable) ones
+        double surface = std::abs((currentBuffer->to_world(PHYS_X,geomBox.x()+dx)-currentBuffer->to_world(PHYS_X,geomBox.x()))
+                                  *(currentBuffer->to_world(PHYS_Y,geomBox.y()+dy)-currentBuffer->to_world(PHYS_Y,geomBox.y())));
 
         sumLE->setText(QLocale().toString(sum));
         meanLE->setText(QLocale().toString(mean));

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- non-linear scale: rulers with ticks at growing spacing -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <path d="M 60 540 L 580 540 M 80 560 L 80 20" fill="none" stroke="#000" stroke-width="40"/>
+  <path d="M 200 540 L 200 440 M 290 540 L 290 440 M 400 540 L 400 440 M 550 540 L 550 440" fill="none" stroke="#000" stroke-width="30"/>
+  <path d="M 80 420 L 180 420 M 80 330 L 180 330 M 80 220 L 180 220 M 80 70 L 180 70" fill="none" stroke="#000" stroke-width="30"/>
+</svg>

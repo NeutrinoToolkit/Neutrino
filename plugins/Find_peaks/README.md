@@ -52,8 +52,8 @@ peak [px] (shown next to the values):
 - **Set scale**, **Set origin**: set only the scale or only the origin of the image, along the direction of the
   profile. **Calibrate** sets both.
 
-The scale of an image is linear: if the spacing changes along the profile, the scale is the mean one (use the
-polynomial fit for a non linear axis). The first peak is the first one *found*: if the real first peak is outside
+The scale is linear: if the spacing changes along the profile, it is the mean one (use **Set non-linear scale**).
+The first peak is the first one *found*: if the real first peak is outside
 the region or too weak, the origin is wrong by whole spacings (check the red lines).
 
 The region stays on the same pixels when the origin changes.
@@ -67,6 +67,17 @@ of the fit:
 - unchecked: the position [px] as a function of the peak number, pos = c₀ + c₁·n + c₂·n² + ...
 - **Fit number(position)**: the peak number as a function of the position,
   n = c₀ + c₁·pos + c₂·pos² + ...: e.g. a non linear calibration of the axis.
+
+**Set non-linear scale** makes the axis of the image (along the direction of the profile) a polynomial of the
+pixel, as in Image_list: the peak number is fitted as a polynomial n(p) of the position of the **Order**, and the
+world coordinate is **First peak at** + **Peak spacing** × n(p) (e.g. the lines of a calibration lamp on a
+spectrometer, at known wavelengths every **Peak spacing**). It is an absolute calibration: the origin of the image
+does not change (order 1: a linear scale, the origin is moved). The fit must be monotonic over the whole image:
+with a high order, the image far from the peaks can fold back, and the axis is refused (lower the order). The
+status bar shows the coefficients.
+
+On a non-linear axis, **Set origin** shifts the values so that the first peak is at **First peak at**, without
+moving the origin, and **Set scale** (or **Calibrate**) makes the axis linear again.
 
 The status bar shows the number of points, the covariances of the linear fit and its residual.
 

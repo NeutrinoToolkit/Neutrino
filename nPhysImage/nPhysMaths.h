@@ -274,6 +274,7 @@ int laplace_fill(physD &, const std::vector<vec2i> &pixels, double tol=1e-6, int
 template <class T>
 inline void phys_flip_ud(nPhysImageF<T> &img)
 {
+    img.copy_scale_poly(img, 0, 1, img.getH(), -1); // the non-linear axes follow the content
     for (size_t i=0; i<img.getW(); i++) {
         for (size_t j=0; j<img.getH()/2; j++) {
             std::swap(img.Timg_matrix[j][i],img.Timg_matrix[img.getH()-j-1][i]);
@@ -284,6 +285,7 @@ inline void phys_flip_ud(nPhysImageF<T> &img)
 template <class T>
 inline void phys_flip_lr(nPhysImageF<T> &img)
 {
+    img.copy_scale_poly(img, img.getW(), -1, 0, 1); // the non-linear axes follow the content
     for (size_t i=0; i<img.getW()/2; i++) {
         for (size_t j=0; j<img.getH(); j++) {
             std::swap(img.Timg_matrix[j][i],img.Timg_matrix[j][img.getW()-i-1]);
@@ -301,6 +303,7 @@ inline void phys_rotate_left(nPhysImageF<T> &img)
             img.set(i,j,rotated.point(rotated.getW()-1-j,i));
         }
     }
+    rotated.copy_scale_poly(img, 0, 1, rotated.getW(), -1, true); // the non-linear axes follow the content
 }
 
 template <class T>
@@ -313,6 +316,7 @@ inline void phys_rotate_right(nPhysImageF<T> &img)
             img.set(i,j,rotated.point(j,rotated.getH()-1-i));
         }
     }
+    rotated.copy_scale_poly(img, rotated.getH(), -1, 0, 1, true);
 }
 
 // methods for matrix operations

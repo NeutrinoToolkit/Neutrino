@@ -639,9 +639,31 @@ NB_MODULE(_neutrino, m) {
                 vec2f s=img.get()->get_scale();
                 return std::make_pair(s.x(), s.y());
             }, [](PyImage &img, std::pair<double,double> s) {
-                img.get()->set_scale(vec2f(s.first, s.second));
+                // a linear scale replaces the non-linear axis whose value changes (as in Image_list)
+                nPhysD *phys=img.get();
+                if (s.first!=phys->get_scale().x()) phys->set_scale_poly(PHYS_X, {});
+                if (s.second!=phys->get_scale().y()) phys->set_scale_poly(PHYS_Y, {});
+                phys->set_scale(vec2f(s.first, s.second));
                 img.neu->emitPhysChanged(img.phys);
             }, "(x, y) size of a pixel")
+        // non-linear axes: world = P(p) - P(origin), P polynomial of the absolute pixel along each axis
+        .def_prop_rw("scalePoly", [](const PyImage &img) {
+                return std::make_pair(img.get()->get_scale_poly(PHYS_X), img.get()->get_scale_poly(PHYS_Y));
+            }, [](PyImage &img, std::pair<std::vector<double>,std::vector<double>> c) {
+                nPhysD *phys=img.get();
+                bool okx=phys->set_scale_poly(PHYS_X, c.first), oky=phys->set_scale_poly(PHYS_Y, c.second);
+                img.neu->emitPhysChanged(img.phys);
+                if (!okx || !oky) throw nb::value_error("not monotonic over the image: axis not changed");
+            }, "([c0, c1, ...], [c0, c1, ...]): the polynomials of the pixel of the non-linear axes x and y "
+               "([] or degree 1: linear, the scale). The world coordinate is P(p) - P(origin) + c0 (P(p) with the origin at 0)")
+        .def("toWorld", [](const PyImage &img, double x, double y) {
+                vec2f w=img.get()->to_real(vec2f(x,y));
+                return std::make_pair(w.x(), w.y());
+            }, "x"_a, "y"_a, "World coordinates of the pixel (x, y), also along non-linear axes")
+        .def("toPixel", [](const PyImage &img, double x, double y) {
+                vec2f p=img.get()->to_pixel(vec2f(x,y));
+                return std::make_pair(p.x(), p.y());
+            }, "x"_a, "y"_a, "Pixel of the world coordinates (x, y)")
         .def("array", [](const PyImage &img) { return toArray(*img.get()); }, "A copy of the pixels: array[y, x]")
         .def("__array__", [](const PyImage &img, nb::object dtype, nb::object) {
                 nb::object arr=nb::cast(toArray(*img.get()));

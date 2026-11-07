@@ -139,13 +139,49 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
 
         QSizeF size(my_view->nparent->currentBuffer->getW(),my_view->nparent->currentBuffer->getH());
 
+        nPhysD *buf=my_view->nparent->currentBuffer;
+        // non-linear axis (polynomial): round values in world units over the range of the image, each one at its
+        // pixel (to_pixel); the ticks are not evenly spaced. Linear axes: the loops below, unchanged
+        const bool polyX=buf->has_scale_poly(PHYS_X), polyY=buf->has_scale_poly(PHYS_Y);
+        auto tickRange=[](nPhysD *b, phys_direction d, double N, double step, int &i0, int &i1) {
+            const double w0=b->to_world(d,0), w1=b->to_world(d,N);
+            i0=std::floor(5.0*std::min(w0,w1)/step)-1;
+            i1=std::ceil(5.0*std::max(w0,w1)/step)+1;
+            return std::isfinite(w0) && std::isfinite(w1) && i1-i0<100000;
+        };
+
         int exponentX=log10(std::abs(my_sc.x()*size.width()));
+        if (polyX) exponentX=log10(std::abs(buf->to_world(PHYS_X,size.width())-buf->to_world(PHYS_X,0)));
         for (long unsigned int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
             double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentX-1);
-            if (my_sc.x()>0){
+            int i0, i1;
+            if (polyX) {
+                if (tickRange(buf,PHYS_X,size.width(),ticsTmp,i0,i1)) for (int i=i0;i<=i1;i++) {
+                    double position=buf->to_pixel(PHYS_X,i*ticsTmp/5.0);
+                    if (position>=0 && position<=buf->getW()) {
+                        allTics.moveTo(position,0);
+                        if (i%5) {
+                            allTics.lineTo(position,-0.15*p->fontMetrics().height());
+                        } else {
+                            if(gridVisible) {
+                                allGrid.moveTo(position,0);
+                                allGrid.lineTo(position,size.height());
+                            }
+                            allTics.lineTo(position,-0.3*p->fontMetrics().height());
+                            double numLabel=i*ticsTmp/5.0;
+                            if (std::abs(exponentX)>2) numLabel/=pow(10.0,exponentX);
+                            QString label=" "+QLocale().toString(numLabel)+" ";
+                            QSizeF labelSize=QSizeF(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
+                            rects << qMakePair(label, QRectF(position-labelSize.width()/2,-1.3*labelSize.height(),labelSize.width(),labelSize.height()));
+                        }
+                    }
+                }
+                // the labels from left to right (a decreasing axis): the overlap test compares neighbours
+                std::sort(rects.begin(),rects.end(),[](const my_pair &l, const my_pair &r){ return l.second.left()<r.second.left(); });
+            } else if (my_sc.x()>0){
                 for (int i=-5.0*my_or.x()*my_sc.x()/ticsTmp-1;i<=5.0*(my_view->nparent->currentBuffer->getW()-my_or.x())*my_sc.x()/ticsTmp+1;i+=1) {
                     double position=(i*ticsTmp/5.0/my_sc.x()+my_or.x());
                     if (position>=0 && position<=my_view->nparent->currentBuffer->getW()) {
@@ -224,12 +260,36 @@ nTics::paint(QPainter* p, const QStyleOptionGraphicsItem* option, QWidget* ) {
         p->setPen(pen);
 
         int exponentY=log10(std::abs(my_sc.y()*size.height()));
+        if (polyY) exponentY=log10(std::abs(buf->to_world(PHYS_Y,size.height())-buf->to_world(PHYS_Y,0)));
         for (long unsigned int k=0;k<ticsPerDecade.size();k++) {
             allTics=QPainterPath();
             allGrid=QPainterPath();
             rects.clear();
             double ticsTmp=ticsPerDecade[k]*pow(10.0,exponentY-1);
-            if (my_sc.y()>0){
+            int i0, i1;
+            if (polyY) {
+                if (tickRange(buf,PHYS_Y,size.height(),ticsTmp,i0,i1)) for (int i=i0;i<=i1;i++) {
+                    double position=buf->to_pixel(PHYS_Y,i*ticsTmp/5.0);
+                    if (position>=0&&position<=buf->getH()) {
+                        allTics.moveTo(0,position);
+                        if (i%5) {
+                            allTics.lineTo(-0.15*p->fontMetrics().height(),position);
+                        } else {
+                            if(gridVisible) {
+                                allGrid.moveTo(0,position);
+                                allGrid.lineTo(size.width(),position);
+                            }
+                            allTics.lineTo(-0.3*p->fontMetrics().height(),position);
+                            double numLabel=i*ticsTmp/5.0;
+                            if (std::abs(exponentY)>2) numLabel/=pow(10.0,exponentY);
+                            QString label=" "+QLocale().toString(numLabel)+" ";
+                            QSizeF labelSize=QSizeF(p->fontMetrics().horizontalAdvance(label), p->fontMetrics().height());
+                            rects << qMakePair(label, QRectF(position-labelSize.width()/2,0.3*p->fontMetrics().height(),labelSize.width(),labelSize.height()));
+                        }
+                    }
+                }
+                std::sort(rects.begin(),rects.end(),[](const my_pair &l, const my_pair &r){ return l.second.left()<r.second.left(); });
+            } else if (my_sc.y()>0){
                 for (int i=-5.0*my_or.y()*my_sc.y()/ticsTmp-1;i<=5.0*(my_view->nparent->currentBuffer->getH()-my_or.y())*my_sc.y()/ticsTmp+1;i+=1) {
                     double position=(i*ticsTmp/5.0/my_sc.y()+my_or.y());
                     if (position>=0&&position<=my_view->nparent->currentBuffer->getH()) {

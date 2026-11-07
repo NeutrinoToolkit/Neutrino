@@ -109,8 +109,8 @@ void Lineout_H_V::updatePlot(QPointF p) {
         std::array<phys_direction,2> cut_dir={{PHYS_HORIZONTAL,PHYS_VERTICAL}};
         std::array<phys_direction,2> oth_dir={{PHYS_VERTICAL,PHYS_HORIZONTAL}};
 
-        vec2f origin=currentBuffer->get_origin();
-        vec2f scale=currentBuffer->get_scale();
+        // vec2f origin=currentBuffer->get_origin();
+        // vec2f scale=currentBuffer->get_scale();
         vec2i size=currentBuffer->get_size();
 
         for (int k=0;k<2;k++) {
@@ -123,7 +123,8 @@ void Lineout_H_V::updatePlot(QPointF p) {
 
             QVector<double> x(z_size);
             for (int i=0;i<z_size;i++){
-                x[i]=(i+lat_skip-origin(cut_dir[k]))*scale(cut_dir[k]);
+                // x[i]=(i+lat_skip-origin(cut_dir[k]))*scale(cut_dir[k]);
+                x[i]=currentBuffer->to_world(cut_dir[k],i+lat_skip); // the same, or the non-linear axis
             }
             QVector<double> y(z_size);
             if (k==0) {
@@ -159,7 +160,8 @@ void Lineout_H_V::updatePlot(QPointF p) {
         my_w.plot->rescaleAxes();
         // my_w.plot->replot();
         // setMousePosition replots
-        my_w.plot->setMousePosition((p.x()-origin.x())*scale.x(),(p.y()-origin.y())*scale.y());
+        // my_w.plot->setMousePosition((p.x()-origin.x())*scale.x(),(p.y()-origin.y())*scale.y());
+        my_w.plot->setMousePosition(currentBuffer->to_world(PHYS_X,p.x()),currentBuffer->to_world(PHYS_Y,p.y()));
     }
 }
 

@@ -140,7 +140,7 @@ void Compare_lines::updatePlot() {
 
             // line points are relative to the image origin: pixel of this image = point + its origin
             vec2f shift=phys->get_origin();
-            vec2f scale=phys->get_scale();
+            // vec2f scale=phys->get_scale();
             double dist=0.0;
             for(int ii=0;ii<my_poly.size();ii++) {
                 const QPointF p=my_poly.at(ii);
@@ -151,7 +151,11 @@ void Compare_lines::updatePlot() {
                 }
                 if (ii+1<my_poly.size()) {
                     QPointF deltaP=my_poly.at(ii+1)-p;
-                    dist+=sqrt(pow(deltaP.x()*scale.x(),2)+pow(deltaP.y()*scale.y(),2));
+                    // dist+=sqrt(pow(deltaP.x()*scale.x(),2)+pow(deltaP.y()*scale.y(),2));
+                    // in world units, also along non-linear axes (the same with linear ones)
+                    const QPointF a=p+QPointF(shift.x(),shift.y()), b=a+deltaP;
+                    dist+=std::hypot(phys->to_world(PHYS_X,b.x())-phys->to_world(PHYS_X,a.x()),
+                                     phys->to_world(PHYS_Y,b.y())-phys->to_world(PHYS_Y,a.y()));
                 }
             }
             QCPGraph* graph=plot->addGraph(plot->xAxis, plot->yAxis);

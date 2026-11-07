@@ -40,6 +40,7 @@ Find_peaks::Find_peaks(neutrino *nparent) : nGenericPan(nparent)
     connect(setOrigin, &QPushButton::clicked, this, &Find_peaks::set_origin);
     connect(setScale, &QPushButton::clicked, this, &Find_peaks::set_scale);
     connect(calibrateBoth, &QPushButton::clicked, this, &Find_peaks::calibrate);
+    connect(setScalePoly, &QPushButton::clicked, this, &Find_peaks::set_scale_poly);
     connect(spacingWorld, &QLineEdit::textChanged, this, &Find_peaks::updateCalibration);
     connect(firstPeakWorld, &QLineEdit::textChanged, this, &Find_peaks::updateCalibration);
 
@@ -107,6 +108,17 @@ void Find_peaks::set_origin() {
     if (currentBuffer && calibration(my_scale, my_origin)) {
         // the objects follow the origin of the image: the region goes back on the same pixels
         const QRectF region=box->getRectF();
+        const phys_direction d = direction->isChecked() ? PHYS_Y : PHYS_X;
+        if (currentBuffer->has_scale_poly(d) && !peakPositions.empty()) {
+            // non-linear axis: the values are shifted through c0 (the value at the origin), the origin stays.
+            // (moving the origin shifts them by P(o) - P(o'), which cannot reach every value on a curved axis)
+            std::vector<double> c=currentBuffer->get_scale_poly(d);
+            // the measured first peak: the linear fit is biased on a curved axis
+            c[0]+=locale().toDouble(firstPeakWorld->text())-currentBuffer->to_world(d,peakPositions.front());
+            currentBuffer->set_scale_poly(d,c);
+            nparent->emitPhysChanged(currentBuffer);
+            return;
+        }
         if (direction->isChecked()) {
             currentBuffer->set_origin(currentBuffer->get_origin().x(),my_origin);
         } else {
@@ -122,6 +134,7 @@ void Find_peaks::set_origin() {
 void Find_peaks::set_scale() {
     double my_scale, my_origin;
     if (currentBuffer && calibration(my_scale, my_origin)) {
+        currentBuffer->set_scale_poly(direction->isChecked() ? PHYS_Y : PHYS_X, {}); // a linear scale replaces the non-linear one
         if (direction->isChecked()) {
             currentBuffer->set_scale(currentBuffer->get_scale().x(),my_scale);
         } else {
@@ -194,6 +207,52 @@ bool polynomialfit(std::vector<double> dx, std::vector<double> dy, std::vector<d
     return true;
 }
 
+// non-linear scale: the peak number n is fitted as a polynomial of the position p [px] (order of the fit line),
+// and the world coordinate is P(p) = first + spacing n(p), an absolute calibration: the origin is kept and c0 is
+// chosen so that the world value is P(p) whatever the origin (to_world is P(p) - P(o) + c0)
+void Find_peaks::set_scale_poly() {
+    bool ok1, ok2;
+    const double spacing=locale().toDouble(spacingWorld->text(),&ok1);
+    const double first=locale().toDouble(firstPeakWorld->text(),&ok2);
+    if (!currentBuffer || !ok1 || !ok2 || spacing==0) {
+        statusbar->showMessage(tr("No calibration: invalid world values"));
+        return;
+    }
+    if (order->value()<1) {
+        statusbar->showMessage(tr("The order of the fit must be at least 1"));
+        return;
+    }
+    // positions scaled to ~1 for the conditioning of the fit, then the coefficients scaled back
+    double L=0;
+    for (auto &p : peakPositions) L=std::max(L,std::abs(p));
+    std::vector<double> u(peakPositions.size()), c(order->value()+1);
+    for (size_t i=0;i<u.size();i++) u[i]=peakPositions[i]/L;
+    if (L==0 || !polynomialfit(u,peakNumbers,c)) {
+        statusbar->showMessage(tr("Not enough peaks for order ")+QString::number(order->value()));
+        return;
+    }
+    for (size_t k=0;k<c.size();k++) c[k]*=spacing/pow(L,k);
+    c[0]+=first;
+
+    const phys_direction d = direction->isChecked() ? PHYS_Y : PHYS_X;
+    const double o = d==PHYS_X ? currentBuffer->get_origin().x() : currentBuffer->get_origin().y();
+    c[0]=physPoly::eval(c,o);
+    const QRectF region=box->getRectF();
+    if (!currentBuffer->set_scale_poly(d,c)) {
+        statusbar->showMessage(tr("The fit is not monotonic over the image: lower the order"));
+        return;
+    }
+    nparent->emitPhysChanged(currentBuffer);
+    box->setRect(region); // the region stays on the same pixels (order 1 moves the origin)
+    if (currentBuffer->has_scale_poly(d)) {
+        statusbar->showMessage(tr("Non-linear scale %1: %2").arg(d==PHYS_X ? "x" : "y", QString::fromStdString(physPoly::str(currentBuffer->get_scale_poly(d)))));
+    } else { // order 1: linear
+        statusbar->showMessage(tr("Linear scale %1: %2/px, origin %3 px").arg(d==PHYS_X ? "x" : "y",
+                               locale().toString(currentBuffer->get_scale(d),'g',6),
+                               locale().toString(d==PHYS_X ? currentBuffer->get_origin().x() : currentBuffer->get_origin().y(),'g',6)));
+    }
+}
+
 void Find_peaks::updatePlot() {
     if (!isVisible()) return;
     QRect geom2;
@@ -212,6 +271,8 @@ void Find_peaks::updatePlot() {
         coeff->clear();
         fourier->clear();
         fitFirst=fitSpacing=std::numeric_limits<double>::quiet_NaN();
+        peakNumbers.clear();
+        peakPositions.clear();
         updateCalibration();
         return;
     }
@@ -397,6 +458,8 @@ void Find_peaks::updatePlot() {
         }
         coeff->setText(outcoeff);
 
+        peakNumbers=fitx;
+        peakPositions=fity;
         fitFirst=fitSpacing=std::numeric_limits<double>::quiet_NaN();
         if (fitx.size()>=2) {
             double c0, c1, cov00, cov01, cov11, sum_square;

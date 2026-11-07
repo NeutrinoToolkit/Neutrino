@@ -989,6 +989,9 @@ std::vector <physD> physFormat::phys_open_tiff(std::string ifilename, bool separ
                         }
                         my_phys.setType(PHYS_FILE);
                         my_phys.set_scale(1.0/resx,1.0/resy);
+                        // the non-linear axes saved by Neutrino (all the properties are in TIFFTAG_PHYSPROP)
+                        if (tiff_prop.count("scale_poly_x")) my_phys.set_scale_poly(PHYS_X, physPoly::parse(tiff_prop["scale_poly_x"].get_str()));
+                        if (tiff_prop.count("scale_poly_y")) my_phys.set_scale_poly(PHYS_Y, physPoly::parse(tiff_prop["scale_poly_y"].get_str()));
 
 
                         DEBUG("here");

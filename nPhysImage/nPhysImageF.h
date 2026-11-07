@@ -89,6 +89,54 @@ constexpr double _phys_vacuum_eps = 8.8e-12;
 constexpr double _phys_avogadro   = 6.022e23;
 
 enum phys_way { PHYS_POS, PHYS_NEG };
+
+// non-linear (separable) axes: along each axis the world coordinate is P(p) - P(origin) + c0, P(p) = c0 + c1 p + ...
+// a polynomial of the absolute pixel (scene coordinates). With the origin at 0 it is P(p) (an absolute calibration,
+// e.g. a wavelength); c0 is the world value at the origin. The non-linearity is tied to the detector: moving the
+// origin only shifts the values. The coefficients are the property "scale_poly_x" / "scale_poly_y" (a string,
+// separated by spaces); without it the axis is linear: (p - origin) * scale.
+namespace physPoly {
+    inline double eval(const std::vector<double> &c, double p) {
+        double v=0;
+        for (size_t k=c.size(); k-- > 0;) v=v*p+c[k];
+        return v;
+    }
+    inline double derivative(const std::vector<double> &c, double p) {
+        double v=0;
+        for (size_t k=c.size(); k-- > 1;) v=v*p+k*c[k];
+        return v;
+    }
+    // Q(p) = P(a + b p): the polynomial after a change of the pixel coordinate (crop, flip, resize).
+    // Its constant term is the c0 of P (the value at the origin, which follows the pixels), not Q(0)
+    inline std::vector<double> compose(const std::vector<double> &c, double a, double b) {
+        std::vector<double> q(c.size(),0.0), lin={a,b}, pw={1.0}; // pw = (a + b p)^k
+        for (size_t k=0; k<c.size(); k++) {
+            for (size_t i=0; i<pw.size() && i<q.size(); i++) q[i]+=c[k]*pw[i];
+            std::vector<double> next(pw.size()+1,0.0);
+            for (size_t i=0; i<pw.size(); i++) { next[i]+=pw[i]*lin[0]; next[i+1]+=pw[i]*lin[1]; }
+            pw=next;
+        }
+        if (q.size()) q[0]=c[0];
+        return q;
+    }
+    inline std::vector<double> parse(const std::string &str) {
+        std::vector<double> c;
+        std::string t=str;
+        for (char &ch : t) if (ch==';' || ch==',' || ch=='\t') ch=' ';
+        std::istringstream ss(t);
+        ss.imbue(std::locale::classic());
+        double v;
+        while (ss >> v) c.push_back(v);
+        return c;
+    }
+    inline std::string str(const std::vector<double> &c) {
+        std::ostringstream ss;
+        ss.imbue(std::locale::classic());
+        ss.precision(15);
+        for (size_t k=0; k<c.size(); k++) ss << (k ? " " : "") << c[k];
+        return ss.str();
+    }
+}
 enum phys_fft { PHYS_FORWARD, PHYS_BACKWARD };
 
 
@@ -378,6 +426,7 @@ public:
         subphys.setName(my_name.str());
         subphys.setShortName("submatrix("+getShortName()+")");
         subphys.setFromName(getFromName());
+        copy_scale_poly(subphys, x, 1, y, 1); // pixel p of the crop is x+p here
 
         subphys.TscanBrightness();
         return subphys;
@@ -403,6 +452,7 @@ public:
                 stretched.set(i,j,getPoint(p.x(),p.y()));
 			}
 		}
+		copy_scale_poly(stretched, 0, 1/ratio.x(), 0, 1/ratio.y());
 		return stretched;
 	}
     nPhysImageF<T> stretch(unsigned int newW, unsigned int newH) { return stretch(bidimvec<unsigned int>(newW,newH));}
@@ -484,6 +534,11 @@ public:
 		//FIXME: this must be roto-translated
 //		rotated.set_origin(get_origin());
         rotated.set_scale(get_scale());
+		// the non-linear axes follow the content in the exact cases (any other angle: linear)
+		if (alphaNorm==0.0) copy_scale_poly(rotated, 0, 1, 0, 1);
+		else if (alphaNorm==90.0) copy_scale_poly(rotated, 0, 1, getW(), -1, true);   // new (i,j) = old (W-1-j, i): continuous y' = W - x
+		else if (alphaNorm==180.0) copy_scale_poly(rotated, getW(), -1, getH(), -1);
+		else if (alphaNorm==270.0) copy_scale_poly(rotated, getH(), -1, 0, 1, true);  // new (i,j) = old (j, H-1-i)
 
 		std::ostringstream my_name;
 		my_name << getName() << ".rotate(" << alphaDeg << ")";
@@ -756,16 +811,97 @@ public:
 	inline void set_scale(vec2f val)
     { prop["scale"] = val; }
 	
-	inline vec2f to_real(vec2f val) { 
-		vec2f oo, ss; 
-        oo = prop["origin"]; ss = prop["scale"];
-		return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y()); 
+	// inline vec2f to_real(vec2f val) {
+	// 	vec2f oo, ss;
+	//     oo = prop["origin"]; ss = prop["scale"];
+	// 	return vec2f((val.x()-oo.x())*ss.x(),(val.y()-oo.y())*ss.y());
+	// }
+	//
+	// inline vec2f to_pixel(vec2f val) {
+	// 	vec2f oo, ss;
+	//     oo = prop["origin"]; ss = prop["scale"];
+	// 	return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y());
+	// }
+	inline vec2f to_real(vec2f val) { return vec2f(to_world(PHYS_X,val.x()), to_world(PHYS_Y,val.y())); }
+	inline vec2f to_pixel(vec2f val) { return vec2f(to_pixel(PHYS_X,val.x()), to_pixel(PHYS_Y,val.y())); }
+
+	// the coefficients of the non-linear axis (empty: linear)
+	inline std::vector<double> get_scale_poly(enum phys_direction d) const {
+		auto it=prop.find(d==PHYS_X ? "scale_poly_x" : "scale_poly_y");
+		return it==prop.end() ? std::vector<double>() : physPoly::parse(it->second.get_str());
+	}
+	inline bool has_scale_poly(enum phys_direction d) const { return get_scale_poly(d).size()>2; }
+
+	// sets the non-linear axis. Empty: linear (the scale stays). Degree 1: linear, exactly: c1 (p - o) + c0 is the
+	// scale c1 with the origin o - c0/c1. Otherwise the linear scale becomes the mean slope over the image, for the
+	// code that uses get_scale (an approximation: the rulers, the mouse and the lineouts use the polynomial).
+	// False (nothing changed) if it is not monotonic over the image
+	bool set_scale_poly(enum phys_direction d, std::vector<double> c) {
+		const char *key = d==PHYS_X ? "scale_poly_x" : "scale_poly_y";
+		while (c.size()>0 && c.back()==0) c.pop_back();
+		vec2f sc=get_scale();
+		if (c.size()<=2) {
+			if (c.size()==2 && c[1]==0) return false;
+			prop.erase(key);
+			if (c.size()==2) {
+				vec2f o=get_origin();
+				if (d==PHYS_X) { set_scale(c[1],sc.y()); set_origin(o.x()-c[0]/c[1],o.y()); }
+				else { set_scale(sc.x(),c[1]); set_origin(o.x(),o.y()-c[0]/c[1]); }
+			}
+			return true;
+		}
+		const double N = d==PHYS_X ? getW() : getH();
+		const double d0=physPoly::derivative(c,0);
+		for (int i=0; i<=200; i++) {
+			double dv=physPoly::derivative(c,N*i/200.0);
+			if (dv==0 || (dv>0)!=(d0>0)) return false;
+		}
+		prop[key]=physPoly::str(c);
+		const double mean = N>0 ? (physPoly::eval(c,N)-physPoly::eval(c,0))/N : c[1];
+		if (d==PHYS_X) set_scale(mean,sc.y()); else set_scale(sc.x(),mean);
+		return true;
 	}
 
-	inline vec2f to_pixel(vec2f val) { 
-		vec2f oo, ss; 
-        oo = prop["origin"]; ss = prop["scale"];
-		return vec2f(val.x()/ss.x()+oo.x(),val.y()/ss.y()+oo.y()); 
+	// world coordinate of the pixel p (scene coordinates) along an axis
+	inline double to_world(enum phys_direction d, double p) {
+		std::vector<double> c=get_scale_poly(d);
+		const double o = d==PHYS_X ? get_origin().x() : get_origin().y();
+		if (c.size()>2) return physPoly::eval(c,p)-physPoly::eval(c,o)+c[0];
+		const double s = d==PHYS_X ? get_scale().x() : get_scale().y();
+		return (p-o)*s;
+	}
+
+	// pixel of the world coordinate w: the inverse of to_world (bisection, the axis is monotonic over the image;
+	// outside it, the tangent at the border)
+	inline double to_pixel(enum phys_direction d, double w) {
+		std::vector<double> c=get_scale_poly(d);
+		const double o = d==PHYS_X ? get_origin().x() : get_origin().y();
+		if (c.size()<=2) {
+			const double s = d==PHYS_X ? get_scale().x() : get_scale().y();
+			return w/s+o;
+		}
+		const double N = d==PHYS_X ? getW() : getH();
+		const double target=w+physPoly::eval(c,o)-c[0];
+		double lo=0, hi=N, flo=physPoly::eval(c,lo), fhi=physPoly::eval(c,hi);
+		const bool inc = fhi>flo;
+		if ((inc && target<=flo) || (!inc && target>=flo)) return lo+(target-flo)/physPoly::derivative(c,lo);
+		if ((inc && target>=fhi) || (!inc && target<=fhi)) return hi+(target-fhi)/physPoly::derivative(c,hi);
+		for (int it=0; it<60 && hi-lo>1e-9; it++) {
+			double mid=0.5*(lo+hi), fm=physPoly::eval(c,mid);
+			if ((fm<target)==inc) lo=mid; else hi=mid;
+		}
+		return 0.5*(lo+hi);
+	}
+
+	// the non-linear axes of an image made from this one, its pixel p' = a + b p of this one (along each axis;
+	// swap: x of the new image along y of this one). Continuous (scene) coordinates: a flip is W - p. Linear axes: nothing
+	void copy_scale_poly(nPhysImageF<T> &to, double ax, double bx, double ay, double by, bool swap=false) {
+		std::vector<double> cx=get_scale_poly(PHYS_X), cy=get_scale_poly(PHYS_Y);
+		if (swap) std::swap(cx,cy);
+		to.prop.erase("scale_poly_x");
+		to.prop.erase("scale_poly_y");
+		if (cx.size()>2) to.set_scale_poly(PHYS_X, physPoly::compose(cx,ax,bx));
+		if (cy.size()>2) to.set_scale_poly(PHYS_Y, physPoly::compose(cy,ay,by));
 	}
 
     inline int copies() { return 1; }
@@ -1281,6 +1417,7 @@ nPhysImageF<T>::operator+ (const nPhysImageF<T> &other) const {
 
     new_img.set_origin(prop.at("origin"));
     new_img.set_scale(prop.at("scale"));
+    for (const char *key : {"scale_poly_x","scale_poly_y"}) if (prop.count(key)) new_img.prop[key]=prop.at(key); // same pixels
     new_img.setName("("+prop.at("phys_name").get_str()+")+("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Add");
     for (unsigned int i=0; i<height*width; i++)
@@ -1316,6 +1453,7 @@ nPhysImageF<T>::operator- (const nPhysImageF<T> &other) const {
 
     new_img.set_origin(prop.at("origin"));
     new_img.set_scale(prop.at("scale"));
+    for (const char *key : {"scale_poly_x","scale_poly_y"}) if (prop.count(key)) new_img.prop[key]=prop.at(key); // same pixels
     new_img.setName("("+prop.at("phys_name").get_str()+")-("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Subtract");
 	
@@ -1350,6 +1488,7 @@ nPhysImageF<T>::operator* (const nPhysImageF<T> &other) const {
 	
     new_img.set_origin(prop.at("origin"));
     new_img.set_scale(prop.at("scale"));
+    for (const char *key : {"scale_poly_x","scale_poly_y"}) if (prop.count(key)) new_img.prop[key]=prop.at(key); // same pixels
 	new_img.resize(width, height);
     new_img.setName("("+prop.at("phys_name").get_str()+")*("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Multiply");
@@ -1373,6 +1512,7 @@ nPhysImageF<T>::operator/ (const nPhysImageF<T> &other) const {
 	
     new_img.set_origin(prop.at("origin"));
     new_img.set_scale(prop.at("scale"));
+    for (const char *key : {"scale_poly_x","scale_poly_y"}) if (prop.count(key)) new_img.prop[key]=prop.at(key); // same pixels
     new_img.resize(width, height);
     new_img.setName("("+prop.at("phys_name").get_str()+")/("+other.prop.at("phys_name").get_str()+")");
 	new_img.setShortName("Divide");

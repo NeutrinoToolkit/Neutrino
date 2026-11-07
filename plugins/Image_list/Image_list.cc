@@ -24,6 +24,9 @@
  */
 #include "neutrino.h"
 #include "Image_list.h"
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFormLayout>
 
 Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
     setupUi(this);
@@ -54,6 +57,7 @@ Image_list::Image_list(neutrino *nparent) : nGenericPan(nparent) {
     connect(actionRemove, &QAction::triggered, this, &Image_list::buttonRemovePhys);
     connect(actionCopy, &QAction::triggered, this, &Image_list::buttonCopyPhys);
     connect(actionRescale, &QAction::triggered, this, &Image_list::changeProperties);
+    connect(actionScalePoly, &QAction::triggered, this, &Image_list::changeScalePoly);
 
     show(true);
     updatePad(currentBuffer);
@@ -151,6 +155,9 @@ void Image_list::changeProperties() {
             if (ok1 && ok2) {
                 foreach (nPhysD* phys, physSelected) {
                     if (!nPhysExists(phys)) continue;
+                    // a linear scale replaces the non-linear axis whose value changes
+                    if (xVal!=phys->get_scale().x()) phys->set_scale_poly(PHYS_X, {});
+                    if (yVal!=phys->get_scale().y()) phys->set_scale_poly(PHYS_Y, {});
                     phys->set_scale(xVal,yVal);
                     nparent->emitPhysChanged(phys);
                 }
@@ -214,6 +221,74 @@ void Image_list::changeProperties() {
     }
 }
 
+// the non-linear axes: world = P(p) - P(origin), P a polynomial of the absolute pixel along each axis
+void Image_list::changeScalePoly() {
+    QList<nPhysD*> physSelected;
+    foreach (QTreeWidgetItem* item, images->selectedItems()) {
+        nPhysD *phys=getPhys(item);
+        if (nPhysExists(phys)) physSelected << phys;
+    }
+    if (physSelected.isEmpty() && nPhysExists(currentBuffer)) physSelected << currentBuffer;
+    if (physSelected.isEmpty()) return;
+
+    auto toText=[](const std::vector<double> &c) {
+        QStringList l;
+        for (double v : c) l << QLocale().toString(v,'g',12);
+        return l.join("  ");
+    };
+    nPhysD *last=physSelected.last();
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Non-linear scale"));
+    QFormLayout *form=new QFormLayout(&dialog);
+    QLabel *help=new QLabel(tr("<b>P(p) = c0 + c1·p + c2·p² + ...</b> of the pixel p, counted from the left/top "
+                               "border.<br>World coordinate: P(p) with the origin at 0, otherwise "
+                               "P(p) − P(origin) + c0.<br>Empty: linear axis. Degree 1: sets the scale and the origin."
+                               "<br><i>The rulers, the mouse and the lineouts use the polynomial, the other tools "
+                               "its mean slope (≈ in the list).</i>"), &dialog);
+    help->setWordWrap(true);
+    form->addRow(help);
+    QLineEdit *ex=new QLineEdit(toText(last->get_scale_poly(PHYS_X)), &dialog);
+    QLineEdit *ey=new QLineEdit(toText(last->get_scale_poly(PHYS_Y)), &dialog);
+    ex->setPlaceholderText(tr("linear: %1").arg(QLocale().toString(last->get_scale().x())));
+    ey->setPlaceholderText(tr("linear: %1").arg(QLocale().toString(last->get_scale().y())));
+    ex->setToolTip(tr("Separated by spaces or ;"));
+    ey->setToolTip(ex->toolTip());
+    form->addRow(tr("x(px)"), ex);
+    form->addRow(tr("y(px)"), ey);
+    QDialogButtonBox *buttons=new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    form->addRow(buttons);
+    dialog.resize(420, dialog.sizeHint().height());
+    if (dialog.exec()!=QDialog::Accepted) return;
+
+    auto parse=[](QString t, bool &ok) {
+        std::vector<double> c;
+        ok=true;
+        for (const QString &s : t.split(QRegularExpression("[\\s;]+"), Qt::SkipEmptyParts)) {
+            bool okv;
+            double v=QLocale().toDouble(s,&okv);
+            if (!okv) v=QLocale::c().toDouble(s,&okv);
+            if (!okv) { ok=false; break; }
+            c.push_back(v);
+        }
+        return c;
+    };
+    bool okx, oky;
+    std::vector<double> cx=parse(ex->text(),okx), cy=parse(ey->text(),oky);
+    if (!okx || !oky) {
+        Ui::Image_list::statusBar->showMessage(tr("Not a list of numbers"),5000);
+        return;
+    }
+    foreach (nPhysD* phys, physSelected) {
+        if (!nPhysExists(phys)) continue;
+        bool okSet=phys->set_scale_poly(PHYS_X, cx);
+        okSet = phys->set_scale_poly(PHYS_Y, cy) && okSet;
+        if (!okSet) Ui::Image_list::statusBar->showMessage(tr("Not monotonic over the image: axis not changed"),5000);
+        nparent->emitPhysChanged(phys);
+    }
+}
+
 void Image_list::keyPressEvent(QKeyEvent *e){
     switch (e->key()) {
         case Qt::Key_Return:
@@ -252,6 +327,17 @@ QTreeWidgetItem* Image_list::updateItem(nPhysD *my_phys) {
         it->setData(2,Qt::DisplayRole,QLocale().toString(my_phys->get_scale().x()));
     } else {
         it->setData(2,Qt::DisplayRole,QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
+    }
+    // non-linear axes: the scale is their mean slope (≈), the polynomials in the tooltip
+    const bool px=my_phys->has_scale_poly(PHYS_X), py=my_phys->has_scale_poly(PHYS_Y);
+    if (px || py) {
+        it->setData(2,Qt::DisplayRole,"≈ "+QLocale().toString(my_phys->get_scale().x())+" "+QLocale().toString(my_phys->get_scale().y()));
+        QString tip=tr("Non-linear scale (mean slope shown)");
+        if (px) tip+="\nx: "+QString::fromStdString(physPoly::str(my_phys->get_scale_poly(PHYS_X)));
+        if (py) tip+="\ny: "+QString::fromStdString(physPoly::str(my_phys->get_scale_poly(PHYS_Y)));
+        it->setToolTip(2,tip);
+    } else {
+        it->setToolTip(2,QString());
     }
     it->setData(3,Qt::DisplayRole,QLocale().toString(my_phys->get_origin().x())+" "+QLocale().toString(my_phys->get_origin().y()));
     it->setData(4,Qt::DisplayRole,QString::fromUtf8(my_phys->getName().c_str()));

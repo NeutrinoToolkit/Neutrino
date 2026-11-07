@@ -64,6 +64,10 @@ Images: `neutrino.Image`
 * `img.array()` (or `np.asarray(img)`) the pixels as a numpy copy, shape `(height, width)`; `img.shape`
 * `img.update(array)` replaces the pixels (the shape can change)
 * `img.name`, `img.shortName`, `img.origin`, `img.scale` (read and write)
+* `img.scalePoly = ([c0, c1, c2, ...], [c0, c1, ...])` non-linear axes: along x (and y) the world coordinate is
+  P(p) = c0 + c1·p + c2·p² + ... of the absolute pixel p with the origin at 0, P(p) − P(origin) + c0 otherwise (c0 is
+  the value at the origin). `[]`: linear axis; degree 1 sets the scale and the origin. `img.scale` is then the mean
+  slope over the image. `img.toWorld(x, y)` and `img.toPixel(wx, wy)` convert with them
 * `img.properties()`, `img.property(name)`, `img.setProperty(name, value)` the properties of the image (e.g. read
   from the file)
 * `img.show()`, `img.close(ask=False)`, `img.window()`, `img.valid` (False once closed)

@@ -365,6 +365,16 @@
              </property>
             </widget>
       </item>
+      <item>
+            <widget class="QPushButton" name="setScalePoly">
+             <property name="toolTip">
+              <string>Sets the non-linear scale of the image along the direction of the profile: the world coordinate is First peak at + Peak spacing × n, with n the peak number fitted as a polynomial of the position [px] of this Order (see the help)</string>
+             </property>
+             <property name="text">
+              <string>Set non-linear scale</string>
+             </property>
+            </widget>
+      </item>
      </layout>
     </item>
     <item>

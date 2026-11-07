@@ -461,6 +461,7 @@ physMath::phys_transpose(physD &m1)
             m1.set(i,j,m2.point(j,i));
         }
     }
+    m2.copy_scale_poly(m1, 0, 1, 0, 1, true);
 
     m1.TscanBrightness();
     m1.setName("Traspose("+m1.getName()+")");

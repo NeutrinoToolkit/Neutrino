@@ -60,6 +60,7 @@ public slots:
 
     nPhysD*	getPhys(QTreeWidgetItem*);
     void changeProperties();
+    void changeScalePoly();
 
     void keyPressEvent(QKeyEvent *) override;
     void on_horizontalSlider_valueChanged(int);

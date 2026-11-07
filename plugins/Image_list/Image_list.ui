@@ -193,6 +193,7 @@
    <addaction name="actionName"/>
    <addaction name="actionOrigin"/>
    <addaction name="actionScale"/>
+   <addaction name="actionScalePoly"/>
    <addaction name="actionRescale"/>
   </widget>
   <action name="actionCopy">
@@ -265,6 +266,18 @@
    </property>
    <property name="toolTip">
     <string>Change scale</string>
+   </property>
+  </action>
+  <action name="actionScalePoly">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/scalePoly.png</normaloff>:/icons/scalePoly.png</iconset>
+   </property>
+   <property name="text">
+    <string>Non-linear scale</string>
+   </property>
+   <property name="toolTip">
+    <string>Non-linear scale: a polynomial of the pixel along x and y (rulers, mouse and lineouts)</string>
    </property>
   </action>
   <action name="actionRescale">

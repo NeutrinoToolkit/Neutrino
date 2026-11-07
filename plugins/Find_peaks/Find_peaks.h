@@ -51,6 +51,7 @@ public slots:
     void set_origin();
     void set_scale();
     void calibrate();
+    void set_scale_poly();
     void updateCalibration();
     void on_actionClipboard_triggered();
     void on_actionTxt_triggered();
@@ -63,6 +64,8 @@ private:
     // linear fit of the peak positions [px] against the peak numbers: the first peak and the spacing
     double fitFirst=std::numeric_limits<double>::quiet_NaN();
     double fitSpacing=std::numeric_limits<double>::quiet_NaN();
+    // the peaks: numbers and positions [px]
+    std::vector<double> peakNumbers, peakPositions;
     // the calibration from the fit and the world values of the pan (false if not available)
     bool calibration(double &scale, double &origin);
 };

@@ -24,6 +24,7 @@
  */
 #include "neutrino.h"
 #include "Mouse_info.h"
+#include <QRegularExpression>
 
 
 Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
@@ -57,6 +58,14 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
     show(true);
 }
 
+// the text of a scale field: the scale, or the coefficients of the non-linear axis
+static QString scaleText(nPhysD *phys, phys_direction d) {
+	if (!phys->has_scale_poly(d)) return QLocale().toString(phys->get_scale(d));
+	QStringList l;
+	for (double v : phys->get_scale_poly(d)) l << QLocale().toString(v,'g',12);
+	return l.join("  ");
+}
+
 // table item showing the number in the user locale, the value itself in Qt::UserRole
 static QTableWidgetItem *numberItem(double val) {
     QTableWidgetItem *item= new QTableWidgetItem(QLocale().toString(val));
@@ -76,8 +85,10 @@ void Mouse_info::addPoint(QPointF position) {
         // QTableWidgetItem *y2item= new QTableWidgetItem(py->text());
         QPointF real=position;
         if (currentBuffer) {
-            real=QPointF((position.x()-currentBuffer->get_origin().x())*currentBuffer->get_scale().x(),
-                         (position.y()-currentBuffer->get_origin().y())*currentBuffer->get_scale().y());
+            // real=QPointF((position.x()-currentBuffer->get_origin().x())*currentBuffer->get_scale().x(),
+            //              (position.y()-currentBuffer->get_origin().y())*currentBuffer->get_scale().y());
+            vec2f w=currentBuffer->to_real(vec2f(position.x(),position.y())); // also the non-linear axes
+            real=QPointF(w.x(),w.y());
         }
         QTableWidgetItem *xitem= numberItem(position.x());
         QTableWidgetItem *yitem= numberItem(position.y());
@@ -133,18 +144,54 @@ void Mouse_info::updateOrigin() {
     nparent->my_view->update();
 }
 
+// (previous version: one number per field, the linear scale; a changed value replaced the non-linear axis)
+// void Mouse_info::updateScale() {
+// 	if (currentBuffer) {
+// 		bool ok1, ok2;
+//         double valx=QLocale().toDouble(sc_x->text(),&ok1);
+//         double valy=QLocale().toDouble(sc_y->text(),&ok2);
+// 		if (ok1&&ok2 && currentBuffer->get_scale()!=vec2f(valx,valy)) {
+// 			if (valx!=currentBuffer->get_scale().x()) currentBuffer->set_scale_poly(PHYS_X, {});
+// 			if (valy!=currentBuffer->get_scale().y()) currentBuffer->set_scale_poly(PHYS_Y, {});
+// 			currentBuffer->set_scale(vec2f(valx,valy));
+// 			nparent->emitPhysChanged(currentBuffer);
+// 		}
+// 	}
+//     nparent->my_view->update();
+// }
+// each field: one number, the linear scale (it replaces the non-linear axis); more numbers (spaces or ;), the
+// coefficients c0 c1 c2 ... of the non-linear axis (as in Image_list). A field left as shown changes nothing
 void Mouse_info::updateScale() {
 	if (currentBuffer) {
-		bool ok1, ok2;
-        double valx=QLocale().toDouble(sc_x->text(),&ok1);
-        double valy=QLocale().toDouble(sc_y->text(),&ok2);
-		// if (ok1&&ok2) {
-		// 	currentBuffer->set_scale(vec2f(valx,valy));
-		// }
-		if (ok1&&ok2 && currentBuffer->get_scale()!=vec2f(valx,valy)) {
-			currentBuffer->set_scale(vec2f(valx,valy));
-			nparent->emitPhysChanged(currentBuffer);
+		bool changed=false;
+		for (phys_direction d : {PHYS_X, PHYS_Y}) {
+			QLineEdit *field = d==PHYS_X ? sc_x : sc_y;
+			if (field->text()==scaleText(currentBuffer,d)) continue;
+			std::vector<double> c;
+			bool ok=true;
+			for (const QString &t : field->text().split(QRegularExpression("[\\s;]+"), Qt::SkipEmptyParts)) {
+				bool okv;
+				double v=QLocale().toDouble(t,&okv);
+				if (!okv) v=QLocale::c().toDouble(t,&okv);
+				if (!okv) { ok=false; break; }
+				c.push_back(v);
+			}
+			if (!ok || c.empty()) {
+				statusBar()->showMessage(tr("Scale: a number, or the coefficients c0 c1 c2 ... of a non-linear axis"),5000);
+			} else if (c.size()==1) {
+				currentBuffer->set_scale_poly(d, {});
+				if (d==PHYS_X) currentBuffer->set_scale(c[0],currentBuffer->get_scale().y());
+				else currentBuffer->set_scale(currentBuffer->get_scale().x(),c[0]);
+				changed=true;
+			} else if (currentBuffer->set_scale_poly(d, c)) {
+				changed=true;
+			} else {
+				statusBar()->showMessage(tr("Not monotonic over the image: axis not changed"),5000);
+			}
+			field->setText(scaleText(currentBuffer,d));
+			field->setCursorPosition(0);
 		}
+		if (changed) nparent->emitPhysChanged(currentBuffer);
 	}
     nparent->my_view->update();
 }
@@ -201,13 +248,19 @@ void Mouse_info::updateLabels() {
         // a field being edited is not overwritten
         if (!rx->hasFocus()) rx->setText(QLocale().toString(currentBuffer->get_origin().x()));
         if (!ry->hasFocus()) ry->setText(QLocale().toString(currentBuffer->get_origin().y()));
-        if (!sc_x->hasFocus()) sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
-        if (!sc_y->hasFocus()) sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
+        // if (!sc_x->hasFocus()) sc_x->setText(QLocale().toString(currentBuffer->get_scale().x()));
+        // if (!sc_y->hasFocus()) sc_y->setText(QLocale().toString(currentBuffer->get_scale().y()));
+        if (!sc_x->hasFocus()) { sc_x->setText(scaleText(currentBuffer,PHYS_X)); sc_x->setCursorPosition(0); }
+        if (!sc_y->hasFocus()) { sc_y->setText(scaleText(currentBuffer,PHYS_Y)); sc_y->setCursorPosition(0); }
         if (!unit_x->hasFocus()) unit_x->setText(QString::fromStdString(currentBuffer->prop["unitsX"].get_str()));
         if (!unit_y->hasFocus()) unit_y->setText(QString::fromStdString(currentBuffer->prop["unitsY"].get_str()));
     }
 
 	QPointF p=QPointF(resolution.x()*dist.x(),resolution.y()*dist.y());
+	if (currentBuffer) { // also the non-linear axes (the same with linear ones)
+		vec2f w=currentBuffer->to_real(vec2f(mouse.x(),mouse.y()));
+		p=QPointF(w.x(),w.y());
+	}
 
     px->setText(QLocale().toString(p.x()));
     py->setText(QLocale().toString(p.y()));
