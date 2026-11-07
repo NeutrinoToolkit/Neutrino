@@ -46,6 +46,8 @@
 #include "nPanPlug.h"
 #include "nPreferences.h"
 #include "nOpenRAW.h"
+#include "nHelp.h"
+#include <limits>
 
 #include "ui_nAbout.h"
 
@@ -146,6 +148,19 @@ neutrino::neutrino():
         }
     });
     connect(actionAbout, &QAction::triggered, this, &neutrino::about);
+    actionHelp->setShortcuts(QKeySequence::HelpContents); // F1 (⌘? on macOS)
+    connect(actionHelp, &QAction::triggered, this, [this]() { nHelp::showPage(QString(), this); });
+    // the help at the right of the toolbar, after a spacer: the plugin buttons go before them (addPluginActions
+    // inserts a button before the first action with a larger plugin-order)
+    {
+        QWidget *spacer=new QWidget(toolBar);
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        toolBar->addWidget(spacer)->setProperty("plugin-order",std::numeric_limits<int>::max());
+        toolBar->addAction(actionHelp);
+        actionHelp->setProperty("plugin-order",std::numeric_limits<int>::max());
+    }
+    // (was the plugin Shortcuts)
+    connect(actionShortcuts, &QAction::triggered, this, [this]() { nHelp::showPage("Shortcuts", this); });
     connect(actionPreferences, &QAction::triggered, this, &neutrino::Preferences);
 
 

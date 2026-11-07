@@ -40,6 +40,7 @@
 #include <QPrintDialog>
 
 #include <iostream>
+#include <functional>
 #include "nPhysD.h"
 #include "panThread.h"
 
@@ -56,6 +57,17 @@ class nHelpTextBrowser : public QTextBrowser {
     Q_OBJECT
 public:
     nHelpTextBrowser(QWidget* parent) : QTextBrowser(parent) {}
+
+    // the pages made by the program (e.g. the keyboard shortcuts of the menus): their html by url, empty for the
+    // others (read from the resources)
+    std::function<QString(const QUrl&)> generated;
+    QVariant loadResource(int type, const QUrl &name) override {
+        if (generated && type==QTextDocument::HtmlResource) {
+            QString html=generated(name);
+            if (!html.isEmpty()) return html;
+        }
+        return QTextBrowser::loadResource(type,name);
+    }
 
 public slots:
     void print() {

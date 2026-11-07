@@ -24,6 +24,7 @@
  */
 #include "nGenericPan.h"
 #include "ui_nPanHelp.h"
+#include "nHelp.h"
 
 // #include "nApp.h"
 #include "nCore.h"
@@ -124,29 +125,34 @@ void nGenericPan::raiseNeutrino() {
     }
 }
 
+// (previous version: a help window per pan, with its README only)
+// void nGenericPan::help() {
+//     if (helpwin.isNull()) {
+//         QString helpFile(property("helpFile").toString());
+//         if (QFileInfo(helpFile).exists()) {
+//             helpwin= new QMainWindow(this);
+//             Ui::PanHelp my_help;
+//             my_help.setupUi(helpwin);
+//             helpwin->setWindowTitle(panName()+" help");
+//             my_help.help->setSource(QUrl("qrc"+helpFile));
+//             connect(my_help.actionHome, &QAction::triggered, my_help.help, &nHelpTextBrowser::home);
+//             connect(my_help.actionBack, &QAction::triggered, my_help.help, &nHelpTextBrowser::backward);
+//             connect(my_help.actionForward, &QAction::triggered, my_help.help, &nHelpTextBrowser::forward);
+//             connect(my_help.actionPrint, &QAction::triggered, my_help.help, &nHelpTextBrowser::print);
+//             connect(my_help.actionIncreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomIn);
+//             connect(my_help.actionDecreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomOut);
+//             helpwin->show();
+//         }
+//     } else {
+//         helpwin->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
+//         helpwin->raise();  // for MacOS
+//         helpwin->activateWindow(); // for Windows
+//         helpwin->show();
+//     }
+// }
+// the help of Neutrino (one window, all the helps) on the page of this pan
 void nGenericPan::help() {
-    if (helpwin.isNull()) {
-        QString helpFile(property("helpFile").toString());
-        if (QFileInfo(helpFile).exists()) {
-            helpwin= new QMainWindow(this);
-            Ui::PanHelp my_help;
-            my_help.setupUi(helpwin);
-            helpwin->setWindowTitle(panName()+" help");
-            my_help.help->setSource(QUrl("qrc"+helpFile));
-            connect(my_help.actionHome, &QAction::triggered, my_help.help, &nHelpTextBrowser::home);
-            connect(my_help.actionBack, &QAction::triggered, my_help.help, &nHelpTextBrowser::backward);
-            connect(my_help.actionForward, &QAction::triggered, my_help.help, &nHelpTextBrowser::forward);
-            connect(my_help.actionPrint, &QAction::triggered, my_help.help, &nHelpTextBrowser::print);
-            connect(my_help.actionIncreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomIn);
-            connect(my_help.actionDecreaseFont, &QAction::triggered, my_help.help, &nHelpTextBrowser::zoomOut);
-            helpwin->show();
-        }
-    } else {
-        helpwin->setWindowState(windowState() & (~Qt::WindowMinimized | Qt::WindowActive));
-        helpwin->raise();  // for MacOS
-        helpwin->activateWindow(); // for Windows
-        helpwin->show();
-    }
+    nHelp::showPage(property("helpFile").toString(), nparent); // the resource found by the toolbar
 }
 
 void nGenericPan::reopenWithoutSavedValues() {
@@ -320,13 +326,19 @@ void nGenericPan::show(bool onlyOneAllowed) {
             // has spaces for the underscores
             QFile helpFile(":/"+QString(metaObject()->className())+"README.html");
             if (!helpFile.exists()) helpFile.setFileName(":/"+panName()+"README.html");
-            if (helpFile.exists()) {
-                setProperty("helpFile",helpFile.fileName());
-                my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,&nGenericPan::help);
-            }
+            // if (helpFile.exists()) {
+            //     setProperty("helpFile",helpFile.fileName());
+            //     my_tool->addAction(QIcon(":icons/help.png"),tr("Help"),this,&nGenericPan::help);
+            // }
+            // the help is the first entry of the menu below (the general page if the pan has none)
+            if (helpFile.exists()) setProperty("helpFile",helpFile.fileName());
 
             // the hidden gestures of the pans, in a menu
             QMenu *menu=new QMenu(this);
+            QAction *helpAct=menu->addAction(QIcon(":icons/help.png"),helpFile.exists() ? tr("Help") : tr("Neutrino help"),this,&nGenericPan::help);
+            helpAct->setShortcuts(QKeySequence::HelpContents);
+            helpAct->setToolTip(helpFile.exists() ? tr("The page of this window in the help of Neutrino") : tr("The help of Neutrino (this window has no page)"));
+            menu->addSeparator();
             menu->addAction(QIcon(":icons/iconBW.png"),tr("Raise viewer"),this,&nGenericPan::raiseNeutrino);
             menu->addSeparator();
             QAction *act=menu->addAction(QIcon(":icons/savePy.png"),tr("Copy as Python"),this,&nGenericPan::print);
@@ -348,7 +360,8 @@ void nGenericPan::show(bool onlyOneAllowed) {
             QToolButton *menuButton=new QToolButton(my_tool);
             menuButton->setObjectName("panMenu");
             menuButton->setIcon(QIcon(":icons/gearPy.png"));
-            menuButton->setToolTip(tr("Raise viewer, python, screenshot, reset"));
+            // menuButton->setToolTip(tr("Raise viewer, python, screenshot, reset"));
+            menuButton->setToolTip(tr("Help, raise viewer, python, screenshot, reset"));
             menuButton->setMenu(menu);
             menuButton->setPopupMode(QToolButton::InstantPopup);
             my_tool->addWidget(menuButton);

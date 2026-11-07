@@ -390,6 +390,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionHelp"/>
+    <addaction name="actionShortcuts"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
@@ -511,6 +513,29 @@
    </property>
    <property name="shortcut">
     <string>-</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/help.png</normaloff>:/icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Neutrino help</string>
+   </property>
+   <property name="toolTip">
+    <string>The help of Neutrino and of its tools</string>
+   </property>
+  </action>
+  <action name="actionShortcuts">
+   <property name="text">
+    <string>Keyboard shortcuts</string>
+   </property>
+   <property name="toolTip">
+    <string>The keyboard shortcuts of the menus, of the objects and of the analysis windows (a page of the help)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
    </property>
   </action>
   <action name="actionAbout">

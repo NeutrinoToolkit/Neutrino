@@ -219,6 +219,24 @@ string(APPEND QRC_CONTENT "    </qresource>\n</RCC>")
 file(CONFIGURE OUTPUT ${CMAP_QRC} CONTENT "${QRC_CONTENT}" @ONLY)
 
 
+# the general page of the help (nHelp): resources/help/README.md -> NeutrinoREADME.html, as the helps of the plugins
+# (resources/cmake/NeutrinoPlugin.cmake, where PANDOC and PANDOC_EMBED_ARGS are found: the plugins come first)
+set(HELP_QRC "")
+if(PANDOC)
+    set(HELP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources/help)
+    set(HELP_HTML ${CMAKE_CURRENT_BINARY_DIR}/NeutrinoREADME.html)
+    set(HELP_QRC ${QRCDIR}/neutrinoHelp.qrc)
+    set_source_files_properties(${HELP_DIR}/README.md PROPERTIES HEADER_FILE_ONLY TRUE)
+    file(CONFIGURE OUTPUT ${HELP_QRC} CONTENT "<RCC>\n    <qresource>\n        <file alias=\"NeutrinoREADME.html\">${HELP_HTML}</file>\n    </qresource>\n</RCC>" @ONLY)
+    add_custom_command(
+        OUTPUT ${HELP_HTML}
+        COMMAND ${PANDOC} --metadata title="Neutrino" -V fontsize=14 -s README.md ${PANDOC_EMBED_ARGS} -o ${HELP_HTML}
+        MAIN_DEPENDENCY ${HELP_DIR}/README.md
+        WORKING_DIRECTORY ${HELP_DIR}
+        )
+    add_custom_target(pandocNeutrino ALL DEPENDS ${HELP_HTML} SOURCES ${HELP_DIR}/README.md)
+endif()
+
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)
 include_directories(graphics pans)
 
@@ -227,7 +245,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QR
 # set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC})
 # set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
 # set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_QRC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
-set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_RCC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
+# set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_RCC} ${LICENSES_QRC} ${CMAP_QRC} ${VERSION_CC})
+# (help.qrc: the pages of the help that are not made by pandoc, e.g. the template of the keyboard shortcuts)
+set(filedeps ${SOURCES} ${UIS} ${ICONS_QRC} ${ICONS_DARK_RCC} ${LICENSES_QRC} ${CMAP_QRC} ${HELP_QRC} ${CMAKE_CURRENT_SOURCE_DIR}/../resources/help/help.qrc ${VERSION_CC})
 
 # libNeutrino: everything but main.cc, with the plugins compiled in (OBJECT libraries, resources/cmake/NeutrinoPlugin.cmake).
 # The executable is main.cc; a python module can load the library
