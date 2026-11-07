@@ -97,6 +97,7 @@ public slots:
     void transpose();
 
     void menuPaths();
+    void updateMenuButtons();
 
     // void loadPlugin();
     // void loadPlugin(QString pname, bool launch);

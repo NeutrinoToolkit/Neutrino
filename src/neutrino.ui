@@ -692,7 +692,7 @@
     <string>FlipRotate</string>
    </property>
    <property name="toolTip">
-    <string>Flip and Rotate (right click to change)</string>
+    <string>Flip and Rotate</string>
    </property>
   </action>
   <action name="actionRotate_left">

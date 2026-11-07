@@ -28,6 +28,7 @@
 #include <QMetaObject>
 #include <QtSvg>
 #include <QDirIterator>
+#include <QToolButton>
 #include <QPrintDialog>
 #include <QVector>
 #include <QList>
@@ -77,7 +78,7 @@ neutrino::neutrino():
         if (!menuTransformationDefault.isEmpty()) {
             if (act->text()==menuTransformationDefault) {
                 menuTransformation->setDefaultAction(act);
-                actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+                updateMenuButtons();
             }
         } else if (act->icon().cacheKey()==actionFlipRotate->icon().cacheKey()) {
             menuTransformation->setDefaultAction(act);
@@ -91,13 +92,23 @@ neutrino::neutrino():
         if (!defualtActionPath.isEmpty()) {
             if (act->text()==defualtActionPath) {
                 menuPath->setDefaultAction(act);
-                actionPaths->setIcon(menuPath->defaultAction()->icon());
+                updateMenuButtons();
             }
         } else if (act->icon().cacheKey()==actionPaths->icon().cacheKey()) {
             menuPath->setDefaultAction(act);
         }
     }
     connect(actionPaths, &QAction::triggered, this, &neutrino::menuPaths);
+
+    // the paths and flip/rotate buttons of the toolbar: a click repeats the last choice, their arrow shows the menu
+    // (it was only a click with a modifier, hard to find)
+    for (auto [action, menu] : {std::pair{actionPaths, menuPath}, std::pair{actionFlipRotate, menuTransformation}}) {
+        if (QToolButton *button = qobject_cast<QToolButton*>(toolBar->widgetForAction(action))) {
+            button->setMenu(menu);
+            button->setPopupMode(QToolButton::MenuButtonPopup);
+        }
+    }
+    updateMenuButtons();
 
 
     connect(actionLine, &QAction::triggered, this, &neutrino::createDrawLine);
@@ -312,6 +323,18 @@ void neutrino::contextMenuEvent (QContextMenuEvent *ev) {
 
 }
 
+// icon and tooltip of the paths and flip/rotate buttons from the default action of their menu
+void neutrino::updateMenuButtons() {
+    const QString modifier=QKeySequence(Qt::SHIFT).toString(QKeySequence::NativeText).remove('+');
+    for (auto [action, menu] : {std::pair{actionPaths, menuPath}, std::pair{actionFlipRotate, menuTransformation}}) {
+        if (QAction *def=menu->defaultAction()) {
+            action->setIcon(def->icon());
+            action->setToolTip(tr("%1 (click). Arrow or %2+click: %3").arg(def->text().remove('&'), modifier,
+                               action==actionPaths ? tr("other paths") : tr("other flips and rotations")));
+        }
+    }
+}
+
 void neutrino::menuPaths() {
     if ( QApplication::keyboardModifiers()!=Qt::NoModifier) {
         menuPath->exec(QCursor::pos());
@@ -335,7 +358,7 @@ void neutrino::rotateLeft() {
         currentBuffer->reset_display();
         showPhys();
     }
-    actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("menuTransformationDefault",menuTransformation->defaultAction()->text());
 
 }
@@ -347,7 +370,7 @@ void neutrino::rotateRight() {
         currentBuffer->reset_display();
         showPhys();
     }
-    actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("menuTransformationDefault",menuTransformation->defaultAction()->text());
 }
 
@@ -359,7 +382,7 @@ void neutrino::flipUpDown() {
         showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",menuTransformation->defaultAction()->text());
-    actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+    updateMenuButtons();
 }
 
 void neutrino::flipLeftRight() {
@@ -370,7 +393,7 @@ void neutrino::flipLeftRight() {
         showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",menuTransformation->defaultAction()->text());
-    actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+    updateMenuButtons();
 }
 
 void neutrino::transpose() {
@@ -381,7 +404,7 @@ void neutrino::transpose() {
         showPhys();
     }
     QSettings("neutrino","").setValue("menuTransformationDefault",menuTransformation->defaultAction()->text());
-    actionFlipRotate->setIcon(menuTransformation->defaultAction()->icon());
+    updateMenuButtons();
 }
 
 nPhysD* neutrino::getBuffer(int i) {
@@ -1733,7 +1756,7 @@ neutrino::createDrawLine() {
     statusBar()->showMessage(tr("Click for points, press Esc to finish"));
     nLine *item = new nLine(this);
     item->interactive();
-    actionPaths->setIcon(menuPath->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("defualtActionPath",menuPath->defaultAction()->text());
 }
 
@@ -1757,7 +1780,7 @@ neutrino::createDrawRect() {
     statusBar()->showMessage(tr("Click for the first point of the rectangle"));
     nRect *item = new nRect(this);
     item->interactive();
-    actionPaths->setIcon(menuPath->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("defualtActionPath",menuPath->defaultAction()->text());
 }
 
@@ -1767,7 +1790,7 @@ neutrino::createDrawPoint() {
     statusBar()->showMessage(tr("Click for the point"));
     nPoint *item = new nPoint(this);
     item->interactive();
-    actionPaths->setIcon(menuPath->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("defualtActionPath",menuPath->defaultAction()->text());
 }
 
@@ -1777,7 +1800,7 @@ neutrino::createDrawEllipse() {
     statusBar()->showMessage(tr("Click and release to create the ellipse"));
     nEllipse *item = new nEllipse(this);
     item->interactive();
-    actionPaths->setIcon(menuPath->defaultAction()->icon());
+    updateMenuButtons();
     QSettings("neutrino","").setValue("defualtActionPath",menuPath->defaultAction()->text());
 }
 
