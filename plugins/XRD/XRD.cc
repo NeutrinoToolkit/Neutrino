@@ -123,7 +123,11 @@ void XRD::on_actionDelIP_triggered() {
         std::unique_ptr<XRDChannel> ch=std::move(ips.back());
         ips.pop_back();
         tabIPs->removeTab(ch->k);
-        // ch (tab, widgets, region, connections) destroyed here; its cropped image stays open
+        // its cropped image too (it was left open, and then unknown to "Remove transformed")
+        nPhysD *my_phys=ch->phys;
+        ch->phys=nullptr;
+        nparent->removePhys(my_phys); // ignores an image already closed
+        // ch (tab, widgets, region, connections) destroyed here
     } else {
         statusbar->showMessage("Cannot remove last IP");
     }
@@ -192,17 +196,19 @@ void XRD::cropImage(unsigned int k, bool show) {
                 physMath::phys_transpose(*dynamic_cast<physD*>(my_phys));
             }
 
+            // fading correction: the signal at the scan is A1 exp(-t/B1) + A2 exp(-t/B2) of the signal at the
+            // exposure, t in minutes ({A1, A2, B1, B2} below, for each IP model)
+            double myfad=1.0;
             double tfad=fadeMin->value();
             if (tfad > 0 ) {
                 QString kind=IPmodel->currentText();
-                double tfad=fadeMin->value();
                 std::map<QString, std::array<double,4>> fad = {
                     {"MS", {0.334, 0.666, 107.320, 33974}},
                     {"TR", {0.535, 0.465, 28.812,  3837.2}},
                     {"SR", {0.579, 0.421, 15.052,  3829.5}},
                     {"ND", {0.559, 0.441, 18.179,  3907.0}},
                     {"MP", {0.565, 0.435, 18.461,  6117.5}}};
-                double myfad = 1/(fad[kind][0]*exp(-tfad/fad[kind][2])+fad[kind][1]*exp(-tfad/fad[kind][3]));
+                myfad = 1/(fad[kind][0]*exp(-tfad/fad[kind][2])+fad[kind][1]*exp(-tfad/fad[kind][3]));
                 physMath::phys_multiply(*my_phys,myfad);
             }
 
@@ -211,7 +217,9 @@ void XRD::cropImage(unsigned int k, bool show) {
             my_phys->set_origin(0,0);
             my_phys->setType(PHYS_DYN);
 
-            my_phys->prop["display_range"]=img->prop["display_range"];
+            // the colour range of the source, corrected as the values
+            vec2f range=img->prop["display_range"];
+            my_phys->prop["display_range"]=vec2f(range.x()*myfad,range.y()*myfad);
             QString tabName=tabIPs->tabText(static_cast<int>(k));
 
             my_phys->setShortName(tabName.toStdString());
@@ -222,23 +230,24 @@ void XRD::cropImage(unsigned int k, bool show) {
             }
             ch.phys=nparent->replacePhys(my_phys,ch.phys,false);
             if(show) {
-                ch.phys->prop["display_range"]=img->prop["display_range"];
                 nparent->showPhys(ch.phys);
             }
-            statusbar->showMessage("IP" + QString::number(k) + " : " + tabName + " cropped");
+            statusbar->showMessage(tabName + tr(" cropped"));
         }
     }
 }
 
 void XRD::on_actionSaveIPs_triggered() {
-    if (nPhysExists(currentBuffer)) {
+    // (it needed a visible image, and started from its directory: the source's is the one of the scan)
+    nPhysD *img=getPhysFromCombo(image);
+    if (nPhysExists(img)) {
         QDir my_dir ("");
         QString my_prefix("");
         QString my_ext("tif");
         bool my_dir_chosen=false;
         if (createDir->isChecked()) {
-            QString currentdir = QFileInfo(QString::fromStdString(currentBuffer->getFromName())).dir().absolutePath();
-            QString my_dir_str = QFileDialog::getExistingDirectory(this,tr("Change monitor directory"),currentdir);
+            QString currentdir = QFileInfo(QString::fromStdString(img->getFromName())).dir().absolutePath();
+            QString my_dir_str = QFileDialog::getExistingDirectory(this,tr("Directory of the IP images"),currentdir);
             if (!my_dir_str.isEmpty()) {
                 my_dir_chosen=true;
                 my_dir=QDir(my_dir_str);
@@ -262,11 +271,10 @@ void XRD::on_actionSaveIPs_triggered() {
                     nparent->fileSave(ch->phys,my_name);
                 }
             }
-            if(my_prefix.isEmpty()) {
-                saveSettings(my_dir.filePath("crop.ini"));
-            } else {
-                saveSettings(my_dir.filePath(my_prefix+".ini"));
-            }
+            // the settings of the pan next to the images: <prefix>.ini (it was <prefix>_.ini)
+            QString iniName=my_prefix;
+            if (iniName.endsWith("_")) iniName.chop(1);
+            saveSettings(my_dir.filePath((iniName.isEmpty() ? QString("crop") : iniName)+".ini"));
         }
     }
 }

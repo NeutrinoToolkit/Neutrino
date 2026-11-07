@@ -95,6 +95,9 @@
          <property name="text">
           <string>dir</string>
          </property>
+         <property name="toolTip">
+          <string>Save: choose a directory (it can be created in the dialog) instead of a file name; the images are &lt;directory name&gt;_&lt;IP name&gt;.tif</string>
+         </property>
          <property name="neutrinoSave" stdset="0">
           <bool>true</bool>
          </property>
