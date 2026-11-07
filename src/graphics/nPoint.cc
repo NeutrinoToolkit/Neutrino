@@ -227,10 +227,12 @@ nPoint::changeColorHolder (QColor color) {
 
 void
 nPoint::setPoint (QPointF p) {
+	// p in scene coordinates (the clicks and the mouse, like nLine::setPoints and nObject::setRect): the point is
+	// stored relative to the item, which sits at the image origin (it was ref.setPos(p): off by the origin)
 	prepareGeometryChange();
-	ref.setPos(p);
-    my_w->xPos->setText(QLocale().toString(p.x()));
-    my_w->yPos->setText(QLocale().toString(p.y()));
+	ref.setPos(mapFromScene(p));
+    my_w->xPos->setText(QLocale().toString(ref.pos().x()));
+    my_w->yPos->setText(QLocale().toString(ref.pos().y()));
 	ref.setVisible(true);
 	itemChanged();
 }
@@ -242,9 +244,9 @@ void nPoint::changePos(QString valStr) {
 	if (ok && edit) {
 		disconnect(edit, &QLineEdit::textChanged, this, &nPoint::changePos);
         if (sender()==my_w->xPos) {
-			setPoint(QPointF(val,ref.pos().y()));
+			setPoint(mapToScene(QPointF(val,ref.pos().y()))); // the pad shows the coordinates of the item
         } else if (sender()==my_w->yPos) {
-			setPoint(QPointF(ref.pos().x(),val));
+			setPoint(mapToScene(QPointF(ref.pos().x(),val)));
 		}
 		connect(edit, &QLineEdit::textChanged, this, &nPoint::changePos);
 	}
@@ -348,7 +350,8 @@ QPainterPath nPoint::shape() const {
 	QPainterPathStroker stroker;
 	stroker.setWidth(4+nWidth/zoom);
 	QPainterPath my_shape = stroker.createStroke( path() );
-	my_shape.addPolygon(ref.mapToScene(ref.rect()));
+	// in the coordinates of the point (not of the scene: they differ by the image origin)
+	my_shape.addPolygon(ref.mapToParent(ref.rect()));
 	return my_shape;
 }
 
@@ -406,7 +409,8 @@ nPoint::loadSettings(QSettings &settings) {
     settings.beginGroup(toolTip());
 //    setPos(settings.value("position").toPoint());
     setPos(settings.value("position").toPointF()); // the origin can be fractional
-    setPoint(QPointF(settings.value("x").toDouble(), settings.value("y").toDouble()));
+    // saved relative to the item (ref.pos()), the item now at the saved position
+    setPoint(mapToScene(QPointF(settings.value("x").toDouble(), settings.value("y").toDouble())));
     setToolTip(settings.value("name",toolTip()).toString());
     setZValue(settings.value("depth",zValue()).toDouble());
     setWidthF(settings.value("width",nWidth).toDouble());

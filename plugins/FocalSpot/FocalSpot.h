@@ -27,6 +27,7 @@
 #include <QWidget>
 
 #include "nGenericPan.h"
+#include "nPhysMaths.h"
 #include "ui_FocalSpot.h"
 
 #ifndef FocalSpot_H_
@@ -47,27 +48,45 @@ public:
 
     QPointer<nLine> nContour;
 
+    // python: Pan.results(): the quantities of the table and the radial profile
+    QVariantMap results(QVariant what=QVariant()) override;
+
 public slots:
     void calculate_stats();
-    QList<double> find_contour(double);
 
     void bufferChanged(nPhysD*);
 
-    void on_centroid_toggled(bool tog);
     void setPosZero(QPointF pos);
+    void setOriginToCentre();
 
     void mouseAtPlot(QMouseEvent*);
     void mouseAtWorld(QPointF);
 
     void loadSettings(QString=QString());
 
+    void on_actionClipboard_triggered();
+    void on_actionTxt_triggered();
 
 private:
-    // blurred image for easier calculations
+    // blurred image: maximum, contour and FWHM
     nPhysD decimated;
-    vec2i centre;          // spot centre used for the statistics (pixels)
+    vec2f centre;          // spot centre used for the statistics (pixels)
     bool computing=false;  // calculate_stats may change the origin, which triggers it again
 
+    // the results: group (one line of the view), sub-name, value, unit
+    struct Row {
+        QString group, sub; double value; QString unit;
+        QString name() const { return sub.isEmpty() ? group : group+" "+sub; }
+    };
+    QList<Row> rows;
+    QVector<double> radius, profile, encircled; // radial profile (world units) and encircled energy fraction
+
+    void addRow(QString group, QString sub, double value, QString unit=QString());
+    void showRows();
+    QString resultsText();
+
+    // the previous computation of the energies (Manual (old method)): {threshold %, contour %}
+    QList<double> legacyEnergies(double th, double zl, const physMath::contour_integral &ci, bool contourOk);
 };
 
 NEUTRINO_PLUGIN(FocalSpot,Analysis);

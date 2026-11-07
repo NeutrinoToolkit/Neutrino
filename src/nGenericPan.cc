@@ -1051,7 +1051,7 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
             if (my_occurrence==occurrence && widget->toolTip() == name) {
                 QPolygonF poly;
                 foreach (QVariant p, my_val.toList()) {
-                    poly << p.toPoint();
+                    poly << p.toPointF(); // (toPoint rounded them)
                 }
                 if (poly.size()>1) widget->setPoints(poly);
                 return;

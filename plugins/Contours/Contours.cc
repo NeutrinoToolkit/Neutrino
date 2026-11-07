@@ -113,12 +113,15 @@ Contours::on_draw_pb_released()
 				currentBuffer->set_origin(centr);
 				nparent->emitPhysChanged(currentBuffer);
 			}
-			// set polygon (after the origin change): the line sits at the image origin, its points are
-			// relative to it; the contour is in pixel coordinates, pixel (i,j) has its centre at (i+0.5,j+0.5)
+			// set polygon (after the origin change): setPoints takes scene coordinates and maps them to the line,
+			// which sits at the image origin (subtracting the origin here moved the contour by -origin).
+			// The contour is in pixel coordinates, pixel (i,j) has its centre at (i+0.5,j+0.5) in the scene
 			vec2f orig=currentBuffer->get_origin();
+			my_c->setPos(orig.x(),orig.y());
             QPolygonF myp;
 			for (auto &p : contour) {
-				myp<<QPointF(p.x()+0.5-orig.x(), p.y()+0.5-orig.y());
+				// myp<<QPointF(p.x()+0.5-orig.x(), p.y()+0.5-orig.y());
+				myp<<QPointF(p.x()+0.5, p.y()+0.5);
 			}
 			my_c->setPoints(myp);
 			my_c->toggleClosedLine(true);

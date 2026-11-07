@@ -212,11 +212,20 @@ vec2f Affine_transformation::affine(vec2f in, std::array<double,6>& vec){
 }
 
 void Affine_transformation::apply() {
-    forward=physMath::getAffine(l1.getPointsVec2f(),l2.getPointsVec2f());
+    // the transformation is applied to the pixels: the points in scene (pixel) coordinates. getPointsVec2f is
+    // relative to the lines (at the image origin): with an origin and a rotation/scale the translation was wrong
+    auto pixels=[](nLine &l) {
+        std::vector<vec2f> v;
+        for (const QPointF &p : l.mapToScene(l.getPoints())) v.push_back(vec2f(p.x(),p.y()));
+        return v;
+    };
+    // forward=physMath::getAffine(l1.getPointsVec2f(),l2.getPointsVec2f());
+    forward=physMath::getAffine(pixels(l1),pixels(l2));
     for (unsigned int i=0; i<forward.size(); i++) {
         forwardLine[i]->setText(QLocale().toString(forward[i]));
     }
-    backward=physMath::getAffine(l2.getPointsVec2f(),l1.getPointsVec2f());
+    // backward=physMath::getAffine(l2.getPointsVec2f(),l1.getPointsVec2f());
+    backward=physMath::getAffine(pixels(l2),pixels(l1));
     for (unsigned int i=0; i<backward.size(); i++) {
         backwardLine[i]->setText(QLocale().toString(backward[i]));
     }

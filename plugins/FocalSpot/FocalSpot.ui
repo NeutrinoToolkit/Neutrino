@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>381</width>
-    <height>392</height>
+    <width>460</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,15 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,1" columnstretch="0,0,0,0">
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>2</number>
+    </property>
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -36,106 +44,197 @@
     <property name="bottomMargin">
      <number>4</number>
     </property>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
+    <item>
+     <layout class="QGridLayout" name="settingsLayout" columnstretch="0,1,1,0">
+      <property name="verticalSpacing">
+       <number>2</number>
       </property>
-      <property name="text">
-       <string>Centroid: </string>
-      </property>
-     </widget>
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelCentre">
+        <property name="text">
+         <string>Centre</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="centreMode">
+        <property name="toolTip">
+         <string>Centre of the spot (contour, radial profile, encircled energy): the maximum of the blurred image, the centroid of the contour, or a point chosen with a double click on the image</string>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>Maximum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Contour centroid</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Manual (double click)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="centreInfo">
+        <property name="toolTip">
+         <string>Centre in pixels</string>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="setOrigin">
+        <property name="toolTip">
+         <string>Moves the origin of the image to the centre of the spot</string>
+        </property>
+        <property name="text">
+         <string>Set origin</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelBackground">
+        <property name="text">
+         <string>Background</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="backgroundMode">
+        <property name="toolTip">
+         <string>Background level subtracted from all the pixels: Auto, the median of a frame at the border of the image (5% of its size); Manual, the value on the right; Manual (old method), the previous computation of the energies, kept for comparison</string>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>Auto (border)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Manual</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Manual (old method)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QDoubleSpinBox" name="zero_dsb">
+        <property name="toolTip">
+         <string>Manual background level [counts]</string>
+        </property>
+        <property name="decimals">
+         <number>3</number>
+        </property>
+        <property name="minimum">
+         <double>-999999999.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>999999999.000000000000000</double>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelLevel">
+        <property name="text">
+         <string>Contour</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="check_dsb">
+        <property name="toolTip">
+         <string>Level of the contour, in % of the peak above the background (50%: the FWHM contour)</string>
+        </property>
+        <property name="suffix">
+         <string> %</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>99.900000000000006</double>
+        </property>
+        <property name="value">
+         <double>50.000000000000000</double>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QDoubleSpinBox" name="blur_radius_sb">
+        <property name="toolTip">
+         <string>Blur of the image used for the maximum, the contour and the FWHM [px] (0: none). The energies, the moments and the radial profile use the image itself</string>
+        </property>
+        <property name="specialValueText">
+         <string>Blur: off</string>
+        </property>
+        <property name="prefix">
+         <string>Blur </string>
+        </property>
+        <property name="suffix">
+         <string> px</string>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>2.000000000000000</double>
+        </property>
+        <property name="neutrinoSave" stdset="0">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Blur radius</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" colspan="3">
-     <widget class="QDoubleSpinBox" name="blur_radius_sb">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="value">
-       <double>2.000000000000000</double>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QToolButton" name="centroid">
-      <property name="toolTip">
-       <string>Doubleclick on image to set centroid</string>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>:/icons/center.png</normaloff>:/icons/center.png</iconset>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="3">
-     <widget class="QCheckBox" name="moveOrigin">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Move the origin of the image to the spot centre</string>
-      </property>
-      <property name="text">
-       <string>Set origin</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0" colspan="4">
+    <item>
      <widget class="QTabWidget" name="tabWidget">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="tabResults">
        <attribute name="title">
-        <string>Data</string>
+        <string>Results</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QVBoxLayout" name="resultsLayout">
         <property name="leftMargin">
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -143,27 +242,31 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QTextEdit" name="stats">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
+        <item>
+         <widget class="QTextBrowser" name="stats">
+          <property name="toolTip">
+           <string>Results in world units (see the help). The toolbar copies or exports them with the radial profile</string>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::Shape::NoFrame</enum>
+          </property>
+          <property name="openLinks">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tabPlot">
        <attribute name="title">
-        <string>Plot</string>
+        <string>Radial</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
+       <layout class="QVBoxLayout" name="plotLayout">
         <property name="leftMargin">
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>4</number>
+         <number>0</number>
         </property>
         <property name="rightMargin">
          <number>0</number>
@@ -171,113 +274,63 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
-         <widget class="nCustomPlotMouseX" name="plot" native="true"/>
+        <item>
+         <widget class="nCustomPlotMouseX2Y" name="radialPlot" native="true"/>
         </item>
        </layout>
       </widget>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Check Level</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" colspan="3">
-     <widget class="QDoubleSpinBox" name="zero_dsb">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="maximum">
-       <double>999999999.000000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.010000000000000</double>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_2">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Zero Level:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1" colspan="3">
-     <widget class="QDoubleSpinBox" name="check_dsb">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="suffix">
-       <string> %</string>
-      </property>
-      <property name="decimals">
-       <number>2</number>
-      </property>
-      <property name="maximum">
-       <double>100.000000000000000</double>
-      </property>
-      <property name="singleStep">
-       <double>0.010000000000000</double>
-      </property>
-      <property name="value">
-       <double>50.000000000000000</double>
-      </property>
-      <property name="neutrinoSave" stdset="0">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QLineEdit" name="centroid_lbl">
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>-- : --</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionClipboard"/>
+   <addaction name="actionTxt"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionClipboard">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/saveClipboard.png</normaloff>:/icons/saveClipboard.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy to Clipboard</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy the results and the radial profile to the clipboard</string>
+   </property>
+  </action>
+  <action name="actionTxt">
+   <property name="icon">
+    <iconset resource="../../resources/icons/icons.qrc">
+     <normaloff>:/icons/saveTxt.png</normaloff>:/icons/saveTxt.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export TXT</string>
+   </property>
+   <property name="toolTip">
+    <string>Export the results and the radial profile to a text file</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>nCustomPlotMouseX</class>
+   <class>nCustomPlotMouseX2Y</class>
    <extends>QWidget</extends>
    <header>nCustomPlots.h</header>
    <container>1</container>

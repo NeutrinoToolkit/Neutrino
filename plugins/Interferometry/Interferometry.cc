@@ -840,7 +840,9 @@ void Interferometry::addShape(QString name){
     if (my_shapes.size()==0){
         poly << QPointF(50,50) << QPointF(50,150) << QPointF(150,150) << QPointF(150,50);
     } else {
-        poly=my_shapes.begin()->second->getPoints();
+        // getPoints is relative to the line, setPoints takes scene coordinates (the copy was moved by -origin)
+        nLine *first=my_shapes.begin()->second;
+        poly=first->mapToScene(first->getPoints());
     }
     my_l->setPoints(poly);
     my_l->changeToolTip(name);
