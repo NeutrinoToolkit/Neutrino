@@ -59,10 +59,19 @@ Mouse_info::Mouse_info (neutrino *parent) : nGenericPan(parent)
 }
 
 // the text of a scale field: the scale, or the coefficients of the non-linear axis
+// static QString scaleText(nPhysD *phys, phys_direction d) {
+// 	if (!phys->has_scale_poly(d)) return QLocale().toString(phys->get_scale(d));
+// 	QStringList l;
+// 	for (double v : phys->get_scale_poly(d)) l << QLocale().toString(v,'g',12);
+// 	return l.join("  ");
+// }
+// without c0: the origin has its own field, so the field holds c1 c2 ... (one number: the linear scale, the same
+// thing); c0, the value at the origin (e.g. the absolute calibration of Find_peaks), is kept and not shown
 static QString scaleText(nPhysD *phys, phys_direction d) {
 	if (!phys->has_scale_poly(d)) return QLocale().toString(phys->get_scale(d));
+	std::vector<double> c=phys->get_scale_poly(d);
 	QStringList l;
-	for (double v : phys->get_scale_poly(d)) l << QLocale().toString(v,'g',12);
+	for (size_t k=1; k<c.size(); k++) l << QLocale().toString(c[k],'g',12);
 	return l.join("  ");
 }
 
@@ -160,7 +169,8 @@ void Mouse_info::updateOrigin() {
 //     nparent->my_view->update();
 // }
 // each field: one number, the linear scale (it replaces the non-linear axis); more numbers (spaces or ;), the
-// coefficients c0 c1 c2 ... of the non-linear axis (as in Image_list). A field left as shown changes nothing
+// coefficients c1 c2 ... of the non-linear axis (Image_list also has c0: here it is kept, 0 for a new axis).
+// A field left as shown changes nothing
 void Mouse_info::updateScale() {
 	if (currentBuffer) {
 		bool changed=false;
@@ -177,16 +187,18 @@ void Mouse_info::updateScale() {
 				c.push_back(v);
 			}
 			if (!ok || c.empty()) {
-				statusBar()->showMessage(tr("Scale: a number, or the coefficients c0 c1 c2 ... of a non-linear axis"),5000);
+				statusBar()->showMessage(tr("Scale: a number, or the coefficients c1 c2 ... of a non-linear axis"),5000);
 			} else if (c.size()==1) {
 				currentBuffer->set_scale_poly(d, {});
 				if (d==PHYS_X) currentBuffer->set_scale(c[0],currentBuffer->get_scale().y());
 				else currentBuffer->set_scale(currentBuffer->get_scale().x(),c[0]);
 				changed=true;
-			} else if (currentBuffer->set_scale_poly(d, c)) {
-				changed=true;
 			} else {
-				statusBar()->showMessage(tr("Not monotonic over the image: axis not changed"),5000);
+				// c0: the one of the axis (0 for a new one, the value at the origin)
+				c.insert(c.begin(), currentBuffer->has_scale_poly(d) ? currentBuffer->get_scale_poly(d)[0] : 0.0);
+				// } else if (currentBuffer->set_scale_poly(d, c)) {
+				if (currentBuffer->set_scale_poly(d, c)) changed=true;
+				else statusBar()->showMessage(tr("Not monotonic over the image: axis not changed"),5000);
 			}
 			field->setText(scaleText(currentBuffer,d));
 			field->setCursorPosition(0);

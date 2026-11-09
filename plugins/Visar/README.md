@@ -65,6 +65,17 @@ A<sub>1</sub> ... A<sub>n</sub> (separated by spaces or ;):
 
 One value is a linear sweep. A negative A<sub>1</sub> means a time going backwards with the pixel.
 
+**To image** sets the axes of the reference and shot images to those of Visar: the rulers, the mouse,
+Mouse_info and the lineouts then show its time and space.
+
+- The time (vertical or horizontal, from the angle of the fringes): the sweep, with the time zero and the offset of
+  the **Velocity** tab, T(X) − T(zero) + offset. A non-linear sweep becomes the non-linear axis of the images (see
+  Image_list) and their origin along the time stays; a linear one is a scale, and the origin moves to the pixel
+  where the time is 0. A sweep that is not monotonic over the image is refused (the space is still set).
+- The space (the other axis): linear, origin at the **Center** and scale the **Magnification**.
+
+The objects of Visar (regions, masks) keep their pixels when the origin moves.
+
 The plot shows the fringe shift (the phase of the shot, averaged over the ROI), the intensities and the contrasts
 of the reference (dashed) and the shot (solid) as functions of the pixel; the fringe shift is also drawn on the
 image.
@@ -108,7 +119,7 @@ reference, along time:
 - **Time zero and delta t**: the pixel of the time zero and the delay, as for the VISARs.
 - **Center & magnification**: as for the VISARs.
 - **Sweep time** and direction: the sweep, as for the VISARs, and the direction of the time (**V**ertical or
-  **H**orizontal).
+  **H**orizontal); **To image** sets it as the time axis of the SOP images, as for the VISARs.
 - **Refl.**: the reflectivity R of the temperature: **Zero** (no reflectivity: blackbody temperature), **Mean** of
   the VISARs at the same time, or a single VISAR.
 - **SOP calibration T0 A**: T<sub>0</sub> is the colour temperature of the light collected by the optics (the

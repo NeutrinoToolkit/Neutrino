@@ -43,7 +43,8 @@ belongs to the detector, not to the zero).
 - The polynomial is saved with the image (`.neus`, `.tif` by Neutrino) and follows the crops, the flips and the 90˚
   rotations; an arbitrary rotation or another file format keeps only the linear approximation.
 
-It can also be set in the Scale fields of Mouse_info (the coefficients instead of a single number) or by Find_peaks
+It can also be set in the Scale fields of Mouse_info (`c1 c2 ...` instead of a single number: there the origin
+has its own field, c0 is not written and is kept) or by Find_peaks
 (**Set non-linear scale**, from the peaks of a calibration spectrum).
 
 From Python: `image.scalePoly = ([c0, c1, c2], [])` (x, y), `image.toWorld(x, y)`, `image.toPixel(wx, wy)`.

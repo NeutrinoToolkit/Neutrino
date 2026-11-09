@@ -369,6 +369,21 @@
              </item>
             </widget>
            </item>
+           <item>
+            <widget class="QToolButton" name="sopToImage">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>The sweep, the time zero and the offset of the SOP as the time axis of its reference and shot images: the rulers, the mouse and the lineouts show the time</string>
+             </property>
+             <property name="text">
+              <string>To image</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>

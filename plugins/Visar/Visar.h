@@ -197,6 +197,13 @@ public slots:
     void sweepChanged();
     void sweepChanged(unsigned int);
     void sweepChangedSOP();
+
+    // "To image": the sweep, time zero and offset of a VISAR (or of the SOP) as the time axis of its images
+    void sweepToImage(unsigned int);
+    void sweepToImageSOP();
+    // void sweepToImages(const std::vector<double> &sweep, bool timeAlongY, double zero, double offset, std::vector<nPhysD*> imgs);
+    void sweepToImages(const std::vector<double> &sweep, bool timeAlongY, double zero, double offset,
+                       double spaceCenter, double magnification, std::vector<nPhysD*> imgs);
     
     void calculate_etalon();
     

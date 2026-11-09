@@ -160,6 +160,7 @@ Visar::Visar(neutrino *parent) : nGenericPan(parent)
     connect(sopPlot, &nSOPPlot::mouseMove, this, &Visar::mouseAtPlot);
     connect(sopScale, &QLineEdit::editingFinished, this, &Visar::sweepChangedSOP);
     connect(sopScaleType, &QComboBox::currentIndexChanged, this, &Visar::sweepChangedSOP);
+    connect(sopToImage, &QAbstractButton::clicked, this, &Visar::sweepToImageSOP);
 
     connect(comboShot, &QComboBox::currentTextChanged, this, &Visar::changeShot);
 
@@ -573,6 +574,7 @@ void Visar::addVisar() {
 
     connect(ui_settings->physScale, &QLineEdit::editingFinished, c, sweepK);
     connect(ui_settings->physScaleType, &QComboBox::currentIndexChanged, c, sweepK);
+    connect(ui_settings->sweepToImage, &QAbstractButton::clicked, c, [this,c]() { sweepToImage(c->k); });
 
     connect(ui_settings->plotPhaseIntensity, &VisarPhasePlot::mouseMove, this, &Visar::mouseAtPlot);
 
@@ -825,6 +827,83 @@ bool Visar::parseSweep(QLineEdit *line, bool normalPoly, std::vector<double> &ve
         }
     }
     return true;
+}
+
+void Visar::sweepToImage(unsigned int k) {
+    if (k>=visars.size()) return;
+    sweepChanged(k);
+    sweepToImages(visars[k]->sweepCoeff, direction(k)==0, visars[k]->velocityUi->physOrigin->value(),
+                  visars[k]->velocityUi->offsetTime->value(),
+                  visars[k]->settingsUi->physOriginSpace->value(), visars[k]->settingsUi->magnification->value(),
+                  {getPhysFromCombo(visars[k]->settingsUi->refImage), getPhysFromCombo(visars[k]->settingsUi->shotImage)});
+}
+
+void Visar::sweepToImageSOP() {
+    sweepChangedSOP();
+    sweepToImages(sweepCoeffSOP, sopDirection->currentIndex()==0, sopOrigin->value(), sopTimeOffset->value(),
+                  physOriginSpace->value(), magnification->value(),
+                  {getPhysFromCombo(sopRef), getPhysFromCombo(sopShot)});
+}
+
+// the time of Visar, T(p) - T(zero) + offset with T(p) = A1 p + A2 p^2 + ... (sweep: the normal coefficients), is the
+// non-linear axis P(p) - P(o) + c0 with P = c0 + T and c0 = T(o) - T(zero) + offset, o the origin of the image: the
+// origin stays. A linear sweep is a linear scale, and the origin moves to zero - offset/A1 (set_scale_poly): the
+// objects of Visar are relative to the origin of the image, they are moved back to keep their pixels.
+// The space, (p - center)*magnification, is the other axis: linear, origin center and scale magnification
+void Visar::sweepToImages(const std::vector<double> &sweep, bool timeAlongY, double zero, double offset,
+                          double spaceCenter, double magnification, std::vector<nPhysD*> imgs) {
+    if (sweep.empty()) {
+        statusbar->showMessage(tr("No sweep time"),5000);
+        return;
+    }
+    if (magnification==0) {
+        statusbar->showMessage(tr("The magnification is 0"),5000);
+        return;
+    }
+    const phys_direction d = timeAlongY ? PHYS_Y : PHYS_X;
+    std::map<nPhysD*,QPointF> moved; // the images whose origin moved, by how much
+    QStringList done, refused;
+    for (nPhysD *img : imgs) {
+        if (!img || moved.count(img)) continue;
+        const vec2f o0=img->get_origin();
+        // the space first (it is not the time axis: the c0 below uses the origin along the time, unchanged)
+        const phys_direction ds = timeAlongY ? PHYS_X : PHYS_Y;
+        img->set_scale_poly(ds, {});
+        if (timeAlongY) {
+            img->set_origin(spaceCenter, o0.y());
+            img->set_scale(magnification, img->get_scale().y());
+        } else {
+            img->set_origin(o0.x(), spaceCenter);
+            img->set_scale(img->get_scale().x(), magnification);
+        }
+        std::vector<double> c(sweep);
+        const double c0=getTime(c, timeAlongY ? o0.y() : o0.x()) - getTime(c, zero) + offset;
+        c.insert(c.begin(), c0);
+        if (img->set_scale_poly(d, c)) done << QString::fromStdString(img->getShortName());
+        else refused << QString::fromStdString(img->getShortName());
+        const vec2f o1=img->get_origin();
+        moved[img]=QPointF(o1.x()-o0.x(), o1.y()-o0.y());
+        nparent->emitPhysChanged(img);
+    }
+    // the objects keep their pixels: their points are relative to the origin of the image they are used on
+    // (getPoints and setRect: relative to the origin; setPoints: in the scene)
+    auto shiftLine = [](nLine *l, QPointF dp) { if (l) l->setPoints(l->mapToScene(l->getPoints().translated(-dp))); };
+    auto shiftRect = [](nRect *r, QPointF dp) { if (r) r->setRect(r->getRectF().translated(-r->pos()-dp)); };
+    for (auto &v : visars) {
+        auto it=moved.find(getPhysFromCombo(v->settingsUi->shotImage));
+        if (it==moved.end() || it->second.isNull()) continue;
+        shiftLine(v->fringeLine, it->second);
+        shiftLine(v->maskRegion, it->second);
+        shiftRect(v->fringeRect, it->second);
+    }
+    auto it=moved.find(getPhysFromCombo(sopShot));
+    if (it!=moved.end() && !it->second.isNull()) shiftRect(sopRect, it->second);
+    // the objects at the new origin (they follow it at a change of the image shown)
+    if (moved.size()) nparent->emitBufferChanged(nparent->getCurrentBuffer());
+    if (refused.size())
+        statusbar->showMessage(tr("The sweep is not monotonic over %1: only the space set").arg(refused.join(", ")),5000);
+    else if (done.size())
+        statusbar->showMessage(tr("Time and space axes set on %1").arg(done.join(", ")),5000);
 }
 
 double Visar::getTime(std::vector<double> &vecsweep, double p) {
