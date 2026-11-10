@@ -25,6 +25,9 @@
 #include "Interferometry.h"
 #include "neutrino.h"
 #include "nPhysMaths.h"
+#include <map>
+#include <queue>
+#include <numeric>
 
 // physWavelets
 
@@ -483,6 +486,100 @@ void Interferometry::doUnwrap () {
                     physMath::phys_multiply(refPhase,-1.0);
                 } else {
                     refPhase = static_cast<physD*>(getLocal("phase_2pi_ref"))->copy();
+                }
+
+                // the angle map has no true residues (around the extrema of a smooth phase the direction turns by 360 deg)
+                // but its noise does: a cut of its unwrap through a clean region flips a whole region by mistake, and
+                // there flipped shot - ref is -(shot+ref), the carrier at double frequency. With the right flips the
+                // flipped shot is continuous across the borders of the regions of the flip map, with the wrong one it
+                // jumps by 2 phase: starting from the largest region, each region keeps the sign of its shot that gives
+                // the smaller sum of the jumps across its borders with the regions already decided.
+                // (not the smoothness inside the region: where the fringe direction is truly reversed |grad phase|
+                // is larger than the carrier and the wrong sign gives the smoother shot-ref)
+                {
+                    const size_t dx=shotFlipped.getW(), dy=shotFlipped.getH();
+                    auto wrapped=[](double v) { return v-std::round(v); };
+                    // regions: 4-connected, same flip
+                    std::vector<int> label(dx*dy,-1);
+                    std::vector<size_t> regionSize, stack;
+                    for (size_t k0=0; k0<dx*dy; k0++) {
+                        if (label[k0]>=0) continue;
+                        const int lab=regionSize.size();
+                        const double val=unwrapAngle.Timg_buffer[k0];
+                        size_t size=0;
+                        stack.assign(1,k0);
+                        label[k0]=lab;
+                        while (!stack.empty()) {
+                            const size_t k=stack.back(); stack.pop_back();
+                            size++;
+                            const size_t i=k%dx, j=k/dx;
+                            for (size_t n : {i>0 ? k-1 : k, i+1<dx ? k+1 : k, j>0 ? k-dx : k, j+1<dy ? k+dx : k}) {
+                                if (n!=k && label[n]<0 && unwrapAngle.Timg_buffer[n]==val) {
+                                    label[n]=lab;
+                                    stack.push_back(n);
+                                }
+                            }
+                        }
+                        regionSize.push_back(size);
+                    }
+                    const size_t nRegions=regionSize.size();
+                    // borders: for each pair of regions the sums of the jumps with the same and the opposite sign
+                    struct Border { double same=0, opposite=0; };
+                    std::vector<std::map<int,Border>> borders(nRegions);
+                    auto addBorder=[&](size_t k, size_t n) {
+                        if (label[k]==label[n]) return;
+                        const double a=shotFlipped.Timg_buffer[k], b=shotFlipped.Timg_buffer[n];
+                        if (!std::isfinite(a) || !std::isfinite(b)) return;
+                        const double same=std::abs(wrapped(a-b)), opposite=std::abs(wrapped(a+b));
+                        Border &bk=borders[label[k]][label[n]], &bn=borders[label[n]][label[k]];
+                        bk.same+=same; bk.opposite+=opposite;
+                        bn.same+=same; bn.opposite+=opposite;
+                    };
+                    for (size_t j=0; j<dy; j++) {
+                        for (size_t i=0; i<dx; i++) {
+                            const size_t k=i+j*dx;
+                            if (i+1<dx) addBorder(k,k+1);
+                            if (j+1<dy) addBorder(k,k+dx);
+                        }
+                    }
+                    // grow from the largest region: next the undecided region with the longest evidence (sum of the
+                    // jumps of both signs) towards the decided ones; toggle[r]: the sign of the region changes
+                    std::vector<int> toggle(nRegions,-1); // -1 undecided
+                    std::vector<double> costKeep(nRegions,0), costToggle(nRegions,0);
+                    std::priority_queue<std::pair<double,int>> queue;
+                    auto decide=[&](int r, bool t) {
+                        toggle[r]=t;
+                        for (auto &[n,b] : borders[r]) {
+                            if (toggle[n]>=0) continue;
+                            // n keeps its sign: the jump is "same" if r kept it, "opposite" if r was toggled
+                            costKeep[n]   += t ? b.opposite : b.same;
+                            costToggle[n] += t ? b.same : b.opposite;
+                            queue.push({costKeep[n]+costToggle[n],n});
+                        }
+                    };
+                    int nToggled=0;
+                    std::vector<int> bySize(nRegions);
+                    std::iota(bySize.begin(),bySize.end(),0);
+                    std::sort(bySize.begin(),bySize.end(),[&](int a, int b) { return regionSize[a]>regionSize[b]; });
+                    for (int seed : bySize) { // (one seed per group of regions with no border between them)
+                        if (toggle[seed]>=0) continue;
+                        decide(seed,false);
+                        while (!queue.empty()) {
+                            const int r=queue.top().second; queue.pop();
+                            if (toggle[r]>=0) continue;
+                            const bool t=costToggle[r]<costKeep[r];
+                            nToggled+=t;
+                            decide(r,t);
+                        }
+                    }
+                    for (size_t k=0; k<dx*dy; k++) {
+                        if (toggle[label[k]]==1) {
+                            shotFlipped.Timg_buffer[k]=-shotFlipped.Timg_buffer[k];
+                            unwrapAngle.Timg_buffer[k]=1-unwrapAngle.Timg_buffer[k];
+                        }
+                    }
+                    DEBUG("unwrap angles: " << nToggled << " of " << nRegions << " regions toggled");
+                    (void)nToggled; // (DEBUG is empty in release)
                 }
 
                 // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
