@@ -15,9 +15,19 @@ w.bufferChanged.connect(lambda: print(w.currentBuffer().mean()))
 neutrino.run()
 ```
 
-`neutrino.run()` is `app.exec()` (it returns when the last window is closed), except in an interactive console: with
-`python -i script.py` or `ipython -i script.py` it returns at once and the console can be used while the windows work
-(in IPython it switches on `%gui qt`). In an IPython session started without a script, `%gui qt` does the same.
+At the prompt of python or IPython, `neutrino.run()` does everything and returns the window:
+
+```python
+>>> import neutrino
+>>> n = neutrino.run()                 # or neutrino.run("shot.neus", ...): the files open in a new window
+>>> n.currentImage().shape
+```
+
+`neutrino.run(*files)` creates the QApplication if there is none, and a window if there is none or files are given
+(otherwise it takes the last window). In an interactive console (`python`, `python -i script.py`, IPython) it returns
+the window at once and the console stays usable while the windows work (PySide6 runs the Qt events while the console
+waits; in IPython it switches on `%gui qt`). In a script it is `app.exec()`: it returns the exit code when the last
+window is closed.
 
 Installation
 ------------
@@ -45,7 +55,7 @@ Windows: `neutrino.Window`
 * `w.currentBuffer()` the pixels of the shown image (a numpy copy), `w.currentImage()` the shown `Image`,
   `w.images()` all of them
 * `w.fileOpen(filename)` returns the list of the `Image`s of the file, `w.fileSave(...)`
-* `w.openPan(name)` opens a tool (`neutrino.plugins()` the names), `w.getPan(name)`, `w.pans()`,
+* `w.openPan(name)` opens a tool (`neutrino.plugins()` the names; `ValueError` for an unknown name), `w.getPan(name)` (`None` if it is not open), `w.pans()`,
   `w.newPan("name")` an empty tool with that name (its title, `w.getPan("name")`), for PySide widgets: see
   `Pan` below
 * `w.close(ask=False)` closes it; `w.askCloseUnsaved` (False for the windows made in python) asks to save the images
@@ -76,7 +86,11 @@ Tools: `neutrino.Pan`
 ---------------------
 
 * `p.get("name")`, `p.set("name", value)`, `p.button("name")` (waits for the calculation it starts): the name of a
-  widget is in square brackets in its tooltip; `p.widgets()` all the names
+  widget is in square brackets in its tooltip. `p.get()` without a name: all of them, `{name: value}`;
+  `p.entries()` their kinds, `{name: class}`; an unknown name is a `ValueError` (listing the names).
+  The objects of a pan by their name (their tooltip, e.g. `"Box lineoutrect"`), in pixels of the shown image:
+  rectangles and ellipses `(x, y, width, height)`, lines `[(x, y), ...]`, points `(x, y)`; `p.get(name)` gives them
+  back the same way. `p.widgets()` the object names of all the widgets (also those that get and set don't use)
 * `p.getData(...)`, `p.show()`, `p.close()`, `p.raise_()`, `p.window()`
 * `p.results(what=None)`: the data calculated by the pan, a dict of numpy arrays. By default the curves of its plots
   (`{plot: {graph: {"x": ..., "y": ...}}}`, `what` the name of a plot); Visar gives

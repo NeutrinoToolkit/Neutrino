@@ -919,6 +919,38 @@ bool nGenericPan::nPhysExists(nPhysD* phys){
     return nparent->getBufferList().contains(phys);
 }
 
+// a rectangle in pixels of the image (as getRectF of the objects): a QRectF/QRect or 4 numbers x, y, width, height
+// (from python a tuple or a list)
+static bool toSceneRect(const QVariant &val, QRectF &rect) {
+    if (val.metaType()==QMetaType::fromType<QRectF>() || val.metaType()==QMetaType::fromType<QRect>()) {
+        rect=val.toRectF();
+        return true;
+    }
+    const QVariantList list=val.toList();
+    if (list.size()!=4) return false;
+    double v[4];
+    for (int i=0; i<4; i++) {
+        bool ok;
+        v[i]=list[i].toDouble(&ok);
+        if (!ok) return false;
+    }
+    rect=QRectF(v[0],v[1],v[2],v[3]);
+    return true;
+}
+
+// a point in pixels of the image: a QPointF/QPoint or 2 numbers (from python a tuple or a list)
+static bool toScenePoint(const QVariant &val, QPointF &pt) {
+    if (val.metaType()==QMetaType::fromType<QPointF>() || val.metaType()==QMetaType::fromType<QPoint>()) {
+        pt=val.toPointF();
+        return true;
+    }
+    const QVariantList list=val.toList();
+    if (list.size()!=2) return false;
+    bool okx, oky;
+    pt=QPointF(list[0].toDouble(&okx),list[1].toDouble(&oky));
+    return okx && oky;
+}
+
 void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     bool ok;
     int my_occurrence=1;
@@ -1060,13 +1092,16 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     // objects
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
-        if (widget->parent()==this) {
-            if (my_occurrence==occurrence && widget->toolTip() == name) {
+        // if (widget->parent()==this) { (the occurrence counted all the lines, not those of that name)
+        if (widget->parent()==this && widget->toolTip() == name) {
+            if (my_occurrence==occurrence) {
                 QPolygonF poly;
                 foreach (QVariant p, my_val.toList()) {
-                    poly << p.toPointF(); // (toPoint rounded them)
+                    // poly << p.toPointF(); // (toPoint rounded them)
+                    QPointF pt;
+                    if (toScenePoint(p, pt)) poly << pt; // (from python a point is a tuple)
                 }
-                if (poly.size()>1) widget->setPoints(poly);
+                if (poly.size()>1) widget->setPoints(poly); // (in the scene, as get gives them)
                 return;
             }
             my_occurrence++;
@@ -1076,11 +1111,11 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
         if (widget->parent() == this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                qDebug() << "pippo nrect" << QMetaType::fromName("RectF");
-                if (my_val.canConvert(QMetaType::fromName("RectF"))) {
-                    qDebug() << "here" << my_val.toRectF();
-                    // if (my_val.canConvert(QVariant::RectF)) {
-                    widget->setRect(my_val.toRectF());
+                // qDebug() << "pippo nrect" << QMetaType::fromName("RectF");
+                // if (my_val.canConvert(QMetaType::fromName("RectF"))) { (never true: the type is QRectF)
+                QRectF rect;
+                if (toSceneRect(my_val, rect)) {
+                    widget->setRect(rect); // (in the scene, as getRectF)
                     return;
                 }
             }
@@ -1091,10 +1126,10 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                qDebug() << "pippo npoint" << QMetaType::fromName("PointF");
-                if (my_val.canConvert(QMetaType::fromName("PointF"))) {
-                // if (my_val.canConvert(QVariant::PointF)) {
-                    widget->setPoint(my_val.toPointF());
+                // if (my_val.canConvert(QMetaType::fromName("PointF"))) { (never true: the type is QPointF)
+                QPointF pt;
+                if (toScenePoint(my_val, pt)) {
+                    widget->setPoint(pt);
                     return;
                 }
             }
@@ -1105,10 +1140,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                qDebug() << "pippo nellipse" << QMetaType::fromName("RectF");
-                if (my_val.canConvert(QMetaType::fromName("RectF"))) {
-                    // if (my_val.canConvert(QVariant::RectF)) {
-                    widget->setRect(my_val.toRectF());
+                QRectF rect;
+                if (toSceneRect(my_val, rect)) {
+                    widget->setRect(rect);
                     return;
                 }
             }
@@ -1137,9 +1171,48 @@ void nGenericPan::print() {
             out+="pan.set("+quoted(name)+", "+quoted(val)+")\n";
         }
     }
+    for (nObject *obj : nparent->findChildren<nObject *>()) {
+        if (obj->parent()==this && (qobject_cast<nRect*>(obj) || qobject_cast<nEllipse*>(obj))) {
+            const QRectF r=obj->getRectF();
+            out+="pan.set("+quoted(obj->toolTip())+", ("+QString::number(r.x())+", "+QString::number(r.y())+", "+
+                   QString::number(r.width())+", "+QString::number(r.height())+"))\n";
+        }
+    }
     QApplication::clipboard()->setText(out);
     nparent->statusBar()->showMessage("Copied to clipboard");
     qWarning().noquote() << out;
+}
+
+QList<std::pair<QString,QString>> nGenericPan::entries() {
+    QList<std::pair<QString,QString>> ret;
+    // the same classes as get and set (and in the same order: the first of a name is the one they use)
+    auto addWidgets=[&](auto *type) {
+        using T=std::remove_pointer_t<decltype(type)>;
+        for (T *obj : findChildren<T *>()) {
+            const QString name=obj->objectName();
+            if (name.isEmpty() || name.startsWith("qt_")) continue; // (e.g. the line edit inside a spin box)
+            if constexpr (std::is_same_v<T,QGroupBox>) {
+                if (obj->template findChildren<QRadioButton *>().isEmpty()) continue; // (get: the checked radio button)
+            }
+            ret.append({name,obj->metaObject()->className()});
+        }
+    };
+    addWidgets((QComboBox*)nullptr);
+    addWidgets((QDoubleSpinBox*)nullptr);
+    addWidgets((QSpinBox*)nullptr);
+    addWidgets((QPlainTextEdit*)nullptr);
+    addWidgets((QTextEdit*)nullptr);
+    addWidgets((QLineEdit*)nullptr);
+    addWidgets((QCheckBox*)nullptr);
+    addWidgets((QGroupBox*)nullptr);
+    addWidgets((QTabWidget*)nullptr);
+    for (QObject *obj : children()) { // (the objects of the pan are its children, in the scene of nparent)
+        if (nLine *o=qobject_cast<nLine*>(obj)) ret.append({o->toolTip(),"nLine"});
+        else if (nRect *o=qobject_cast<nRect*>(obj)) ret.append({o->toolTip(),"nRect"});
+        else if (nPoint *o=qobject_cast<nPoint*>(obj)) ret.append({o->toolTip(),"nPoint"});
+        else if (nEllipse *o=qobject_cast<nEllipse*>(obj)) ret.append({o->toolTip(),"nEllipse"});
+    }
+    return ret;
 }
 
 QStringList nGenericPan::widgets() {
@@ -1236,9 +1309,12 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     // objects
     my_occurrence=1;
     foreach (nLine *widget, nparent->findChildren<nLine *>()) {
-        if (widget->parent()==this) {
-            if (my_occurrence==occurrence && widget->toolTip() == name) {
-                return QVariant::fromValue(widget);
+        if (widget->parent()==this && widget->toolTip() == name) {
+            if (my_occurrence==occurrence) {
+                // return QVariant::fromValue(widget);
+                QVariantList points; // in the scene (pixels of the image), as set takes them
+                for (const QPointF &p : widget->mapToScene(widget->getPoints())) points << p;
+                return points;
             }
             my_occurrence++;
         }
@@ -1258,7 +1334,8 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nRect *widget, nparent->findChildren<nRect *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant::fromValue(widget);
+                // return QVariant::fromValue(widget);
+                return widget->getRectF(); // in pixels of the image, as set takes it (python: (x, y, w, h))
             }
             my_occurrence++;
         }
@@ -1267,7 +1344,8 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nPoint *widget, nparent->findChildren<nPoint *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant::fromValue(widget);
+                // return QVariant::fromValue(widget);
+                return widget->mapToScene(widget->getPointF());
             }
             my_occurrence++;
         }
@@ -1276,7 +1354,8 @@ QVariant nGenericPan::get(QString name, int occurrence) {
     foreach (nEllipse *widget, nparent->findChildren<nEllipse *>()) {
         if (widget->parent()==this && widget->toolTip() == name) {
             if (my_occurrence==occurrence) {
-                return QVariant::fromValue(widget);
+                // return QVariant::fromValue(widget);
+                return widget->getRectF();
             }
             my_occurrence++;
         }

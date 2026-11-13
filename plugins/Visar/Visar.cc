@@ -886,9 +886,11 @@ void Visar::sweepToImages(const std::vector<double> &sweep, bool timeAlongY, dou
         nparent->emitPhysChanged(img);
     }
     // the objects keep their pixels: their points are relative to the origin of the image they are used on
-    // (getPoints and setRect: relative to the origin; setPoints: in the scene)
+    // (getPoints: relative to the origin; setPoints, setRect and getRectF: in the scene)
     auto shiftLine = [](nLine *l, QPointF dp) { if (l) l->setPoints(l->mapToScene(l->getPoints().translated(-dp))); };
-    auto shiftRect = [](nRect *r, QPointF dp) { if (r) r->setRect(r->getRectF().translated(-r->pos()-dp)); };
+    // auto shiftRect = [](nRect *r, QPointF dp) { if (r) r->setRect(r->getRectF().translated(-r->pos()-dp)); };
+    // (wrong by the old origin: setRect is in the scene too)
+    auto shiftRect = [](nRect *r, QPointF dp) { if (r) r->setRect(r->getRectF().translated(-dp)); };
     for (auto &v : visars) {
         auto it=moved.find(getPhysFromCombo(v->settingsUi->shotImage));
         if (it==moved.end() || it->second.isNull()) continue;

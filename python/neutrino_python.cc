@@ -549,6 +549,24 @@ struct PySignal {
 
 // NB_MODULE(neutrino, m) {
 // neutrino._neutrino: neutrino/__init__.py imports PySide6 first (its Qt is the one of the module)
+// get and set of a pan: ValueError for a name they don't know (they did nothing, silently), with the names they know
+static void checkEntry(nGenericPan *pan, const std::string &name, int occurrence) {
+    const QString qname=QString::fromStdString(name);
+    int count=0;
+    QStringList names;
+    for (auto &[n, kind] : pan->entries()) {
+        if (n==qname) count++;
+        if (!names.contains(n)) names << n;
+    }
+    if (count==0) {
+        throw nb::value_error(("no widget or object named \""+name+"\" in "+pan->panName().toStdString()+
+                               " (get() and entries() list them: "+names.join(", ").toStdString()+")").c_str());
+    }
+    if (occurrence<1 || occurrence>count) {
+        throw nb::value_error((name+": occurrence "+std::to_string(occurrence)+" of "+std::to_string(count)).c_str());
+    }
+}
+
 NB_MODULE(_neutrino, m) {
     m.doc()="Neutrino image analysis in python: windows, images (numpy arrays) and pans (plugins)";
 #ifndef __phys_debug
@@ -715,12 +733,42 @@ NB_MODULE(_neutrino, m) {
                                 "and Q_PROPERTY of the plugin are available by name")
         .def_prop_ro("valid", [](const PyPan &p) { return !p.pan.isNull(); })
         .def_prop_ro("name", [](const PyPan &p) { return p.get()->panName().toStdString(); })
+        // .def("set", [](PyPan &p, const std::string &widget, nb::handle value, int occurrence) {
+        //         p.get()->set(QString::fromStdString(widget), toVariant(value), occurrence);
+        //     }, "widget"_a, "value"_a, "occurrence"_a=1, "Sets the value of the widget with that object name")
+        // .def("get", [](PyPan &p, const std::string &widget, int occurrence) {
+        //         return fromVariant(p.get()->get(QString::fromStdString(widget), occurrence));
+        //     }, "widget"_a, "occurrence"_a=1, "The value of the widget with that object name")
         .def("set", [](PyPan &p, const std::string &widget, nb::handle value, int occurrence) {
+                checkEntry(p.get(), widget, occurrence);
                 p.get()->set(QString::fromStdString(widget), toVariant(value), occurrence);
-            }, "widget"_a, "value"_a, "occurrence"_a=1, "Sets the value of the widget with that object name")
-        .def("get", [](PyPan &p, const std::string &widget, int occurrence) {
-                return fromVariant(p.get()->get(QString::fromStdString(widget), occurrence));
-            }, "widget"_a, "occurrence"_a=1, "The value of the widget with that object name")
+            }, "widget"_a, "value"_a, "occurrence"_a=1,
+             "Sets the value of the widget with that object name, or of an object of the pan with that name "
+             "(rectangle, ellipse: (x, y, w, h); line: [(x, y), ...]; point: (x, y); in pixels of the image). "
+             "ValueError for an unknown name")
+        .def("get", [](PyPan &p, nb::handle widget, int occurrence) -> nb::object {
+                if (widget.is_none()) { // all of them
+                    nb::dict ret;
+                    for (auto &[name, kind] : p.get()->entries()) {
+                        nb::str key(name.toUtf8().constData());
+                        if (!ret.contains(key)) ret[key]=fromVariant(p.get()->get(name));
+                    }
+                    return ret;
+                }
+                const std::string name=nb::cast<std::string>(widget);
+                checkEntry(p.get(), name, occurrence);
+                return fromVariant(p.get()->get(QString::fromStdString(name), occurrence));
+            }, "widget"_a=nb::none(), "occurrence"_a=1,
+             "The value of the widget with that object name (or of an object of the pan, see set); without a name "
+             "a dict of all of them {name: value}. ValueError for an unknown name")
+        .def("entries", [](PyPan &p) {
+                nb::dict ret;
+                for (auto &[name, kind] : p.get()->entries()) {
+                    nb::str key(name.toUtf8().constData());
+                    if (!ret.contains(key)) ret[key]=nb::str(kind.toUtf8().constData());
+                }
+                return ret;
+            }, "The names that get and set take, {name: kind (the class of the widget or object)}")
         .def("button", [](PyPan &p, const std::string &widget, int occurrence) {
                 p.get()->button(QString::fromStdString(widget), occurrence);
             }, "widget"_a, "occurrence"_a=1, "Clicks the button with that object name (returns when its calculation is done)")
@@ -806,9 +854,18 @@ NB_MODULE(_neutrino, m) {
         .def("fileSave", [](PyWindow &w, PyImage &img, const std::string &fname) {
                 return w.get()->fileSave(img.get(), QString::fromStdString(fname));
             }, "image"_a, "filename"_a)
+        // .def("openPan", [](PyWindow &w, const std::string &name) {
+        //         return toPython(w.get()->openPan(QString::fromStdString(name), false));
+        //     }, "name"_a, "Opens a pan (neutrino.plugins() for the names), None if not found")
         .def("openPan", [](PyWindow &w, const std::string &name) {
-                return toPython(w.get()->openPan(QString::fromStdString(name), false));
-            }, "name"_a, "Opens a pan (neutrino.plugins() for the names), None if not found")
+                nGenericPan *pan=w.get()->openPan(QString::fromStdString(name), false);
+                if (!pan) {
+                    std::string names;
+                    for (auto &plug : nPanPlug::all()) names+=(names.empty() ? "" : ", ")+plug.name.toStdString();
+                    throw nb::value_error(("no pan named \""+name+"\" (the plugins: "+names+")").c_str());
+                }
+                return toPython(pan);
+            }, "name"_a, "Opens a pan (neutrino.plugins() for the names); ValueError if there is none with that name")
         .def("getPan", [](PyWindow &w, const std::string &name, int occurrence) {
                 return toPython(w.get()->getPan(QString::fromStdString(name), occurrence));
             }, "name"_a, "occurrence"_a=1, "An open pan")

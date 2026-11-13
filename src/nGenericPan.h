@@ -163,6 +163,9 @@ public slots:
     QList<QList<qreal> >  getData(QString, int=1);
     void button(QString, int=1);
     QStringList widgets();
+    // the names that get and set take, with their kind (the class): the widgets by object name, the objects of the
+    // pan (lines, rectangles, points, ellipses) by their name (tooltip)
+    QList<std::pair<QString,QString>> entries();
 
     // the data calculated by the pan (python: Pan.results(what), a dict; lists of numbers are numpy arrays).
     // The default has the curves of the plots: {plot: {graph: {"x": [...], "y": [...]}}}; a plugin reimplements it
