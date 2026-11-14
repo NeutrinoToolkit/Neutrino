@@ -90,7 +90,9 @@ Tools: `neutrino.Pan`
   `p.entries()` their kinds, `{name: class}`; an unknown name is a `ValueError` (listing the names).
   The objects of a pan by their name (their tooltip, e.g. `"Box lineoutrect"`), in pixels of the shown image:
   rectangles and ellipses `(x, y, width, height)`, lines `[(x, y), ...]`, points `(x, y)`; `p.get(name)` gives them
-  back the same way. `p.widgets()` the object names of all the widgets (also those that get and set don't use)
+  back the same way. `p.widgets()` the object names of all the widgets (also those that get and set don't use).
+  Combo boxes: the index; for the image choices it is the position in `w.images()`, and `p.set` also takes the
+  `Image` itself (e.g. `p.set("image", img)`)
 * `p.getData(...)`, `p.show()`, `p.close()`, `p.raise_()`, `p.window()`
 * `p.results(what=None)`: the data calculated by the pan, a dict of numpy arrays. By default the curves of its plots
   (`{plot: {graph: {"x": ..., "y": ...}}}`, `what` the name of a plot); Visar gives

@@ -958,7 +958,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
         if (obj->objectName()==name) {
             if (my_occurrence==occurrence) {
 
-                nPhysD* phys = static_cast<nPhysD*>(my_val.value<void*>());
+                // nPhysD* phys = static_cast<nPhysD*>(my_val.value<void*>());
+                // (the QVariant holds an nPhysD*, e.g. an Image from python)
+                nPhysD* phys = my_val.canConvert<nPhysD*>() ? my_val.value<nPhysD*>() : nullptr;
                 if (phys && obj->property("neutrinoImage").isValid()) {
                     qDebug()<<"trovato" << QString::fromStdString(phys->getShortName());
                     for( int pos = 0; pos < obj->count(); pos++ ) {
@@ -973,7 +975,9 @@ void nGenericPan::set(QString name, QVariant my_val, int occurrence) {
 
 
                 int val=my_val.toInt(&ok);
-                if (ok && val>=0 && val < obj->maxVisibleItems()) {
+                // if (ok && val>=0 && val < obj->maxVisibleItems()) {
+                // (maxVisibleItems is the number of rows of the popup, 10: an index >= 10 was ignored)
+                if (ok && val>=0 && val < obj->count()) {
                     obj->setCurrentIndex(val);
                 } else {
                     int pos=obj->findData(my_val);
