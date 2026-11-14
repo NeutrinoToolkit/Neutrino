@@ -86,7 +86,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Use phys(num,x,y) to get an image value</string>
+       <string>: phys(x,y) the shown image, physN(x,y) or n_phys(N,x,y) the image N (see the help)</string>
       </property>
       <property name="plainText">
        <string># see help for more details</string>

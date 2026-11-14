@@ -1,92 +1,93 @@
----
-layout: default-tutorial
-title: Wavelet analysis of an interferogram (fr)
-author: A. Depresseux
----
+Phase of the fringes of a single interferogram by a wavelet analysis, then unwrapped and with the carrier (or a
+reference phase) subtracted. For a shot and its reference together, with masks, interpolation and cutoffs, use the
+**Interferometry** pan; for the density from the phase, the **Integral inversion** pan.
 
-# Traitement des interférogrammes de canal plasma avec Neutrino 
+How it works
+------------
 
-## Réconstruction des franges
+The image is filtered with a set of complex wavelets (gaussian filters in the frequency domain around a carrier):
+each filter is tuned to an interfringe and an orientation, and is as long across the fringes as **Damp** interfringes
+and as long along them as **thick**. Each pixel keeps the filter with the largest response: its phase is the phase of
+the fringes, its amplitude their contrast, its interfringe and orientation the local ones.
 
-1. Ouvrir **Analysis/Wavelet**
-![img1](images/img1.png)
+Typical use
+-----------
 
-2. Cliquer dans la fénêtre **wavelet** sur le carré (*show wavelet region*)
-![img2](images/img2.png)
+1. Choose the **Image** (Wavelet tab).
+2. Show the region (**rect** in the toolbar) and put it around the part of the interferogram to analyse. The region is
+   shown only on its image.
+3. Guess the carrier (**Carrier** in the toolbar): the interfringe and orientation of the fringes, shown next to
+   **Rel. to carrier** and set in the Carrier tab.
+4. Check **Rel. to carrier** and set the scan around the carrier (e.g. stretch 0.8 : 1.2 with 5 values, angle
+   -10 : 10 with 5 values). Start with a coarse scan and refine it.
+5. **Calculate**, then look at `phase_2pi`: its fringes should follow those of the interferogram.
+6. **Unwrap** (Unwrap tab), then **Subtract** (Carrier tab) the carrier or the reference.
 
-3. Sélectionner tout l’interférogramme avec **fill horizontal** et **fill vertical** ou
-une partie soit à la main avec les curseurs soit avec les coordonnées x,y. Il est
-mieux de commencer à restreindre la zone à un endroit où la reconstruction
-paraît raisonnablement envisageable.
+**doAll** in the toolbar runs the wavelet and the unwrap.
 
-4. Aller dans le menu **Wavelet**. Vérifier que l’image est bien sélectionnée et
-appuyer sur le symbole pour estimer l’interfrange et l’orientation des franges.
-![img3](images/img3.png)
+Wavelet
+-------
 
-5. Définir à présent une plage de variation autorisée pour l’interfrange et
-l’orientation des franges. Cocher **Rel. to carrier** pour entrer une plage de
-valeurs par rapport à l’estimation. Partir d’une plage de valeurs large pour
-commencer et ensuite, restreindre l’intervalle à chaque itération pour la
-reconstruction des franges.
-Commencer le calcul avec un nombre de points (number) modéré (ex. 5) entre
-les limites indiquées.
+- **Image**: the interferogram.
+- **Stretch & rotation**: the scan of the filters, Min, Max and number of values for the interfringe (first row)
+  and the angle (second row).
+  - With **Rel. to carrier** the interfringes are in units of the carrier interfringe and the angles are relative to
+    the carrier angle; otherwise in pixels and degrees.
+  - Number 0: no scan, only the carrier.
+  - The scan has to cover the interfringes and orientations of the fringes in the region. More values cost more time
+    (one FFT per filter) but follow the fringes better.
+- **Damp**: length of the filter across the fringes, in interfringes. A long filter is selective (less noise, about
+  1/(π·damp) of relative mismatch of interfringe accepted) but smooths the steep gradients of the phase; a short one
+  follows them but is noisier and lets the background of the image leak into the fringes.
+- **K**: regularization of the interfringe and the angle: each pixel keeps its K best filters and takes the one
+  nearest to the interfringe and angle maps smoothed over the neighbours (weighted by the contrast), against isolated
+  wrong choices in the noisy regions. 0: off (the best filter of each pixel).
+- **log λ**: the interfringes of the scan are spaced geometrically (the same relative step everywhere), otherwise
+  linearly.
+- **thick**: half width of the filter along the fringes (pixels, or carrier interfringes with **Rel. to carrier**).
+  Long averages more noise away but is biased where the fringes bend. 0: the carrier interfringe.
+- **crop region**: also shows the part of the image analysed (`wavelet source`).
+- **synthetic**: also rebuilds an interferogram from the results (`synthetic`), to compare with the original.
+- **Erase previous**: the new results replace those of the previous run, otherwise they are added.
 
-6. La valeur **thick** (longueur de la fenêtre le long des franges ; 0 : l’interfrange de la
-porteuse) impose la plage sur laquelle un saut de frange peut être détecté. Une trop petite valeur fera ressortir le *bruit* tandis qu’une trop
-grande valeur lissera les gradients raides. La valeur **Damp** contribue à lisser
-les discontinuités lors d’un saut de frange. Augmenter la valeur lorsque, après
-calcul, les franges ne sont pas *connectées*. Mais une valeur trop
-importante lisse le gradient.
+The results:
 
-7. **Calculate**. Itérer jusqu’à trouver une configuration satisfaisante. La carte de
-données de sortie **Phase** donne la reconstruction numérique des franges. Elle
-permet d’estimer qualitativement la fidélité de la reconstruction par rapport à
-au suivi des franges sur l’interférogramme d’entrée.
-Les données de sorties sont accessibles en cliquant sur l’icône *i* en haut et
-à l’extrême gauche de la fenêtre du programme. Une fenêtre de dialogue
-**Winlist** apparaît.
+- `phase_2pi`: the wrapped phase, in fringes (1 = 2π), between -0.5 and 0.5.
+- `contrast`: the amplitude of the fringes (the quality map for the unwrap).
+- `intensity`: the image without the fringes.
+- `visibility`: (Imax-Imin)/(Imax+Imin) of the fringes.
+- `lambda`, `angle`: the interfringe and the orientation of the best filter (only when they are scanned), refined
+  between the values of the scan.
 
+Unwrap
+------
 
-![img4](images/img4.png)
+- **FringeShift & Quality**: the wrapped phase (`phase_2pi`) and its quality (`contrast`), chosen automatically
+  after the wavelet.
+- **Method**:
+  - **Simple H+V**, **Simple V+H**: along the rows, then the columns (or the opposite). Fast, but an error propagates
+    along the whole row or column.
+  - **Goldstein**: residues and branch cuts, the flood fill ordered by the quality.
+  - **Miguel**, **Miguel+Quality**: sorting by reliability (Herráez et al.), without or with the quality.
+  - **Quality**: flood fill guided by the quality, the best pixels first.
+- Barrier (check box and **...**): a line that the unwrap does not cross (e.g. the edge of a target).
+- **Unwrap angles**: where the fringes turn by more than 90˚ the best filter can point the opposite way, which flips
+  the sign of the phase. The angle map is unwrapped and the phase flipped where needed (needs an angle scan).
+- **remove carrier**: subtracts the carrier from the result.
 
-## Réconstruction de la phase
-1. Dans la fenêtre **wavelet**, aller à présent dans **unwrap**. Sélectionner les
-données de sortie Phase et Quality (attention à la numérotation des
-données !). Méthode : **Quality**. Puis, Calculate.
-Effectuer le calcul pour l’image et sa référence. Les donnés apparaissent dans
-la **Winlist** sous l’appellation **unwrap**...\\
-![img5](images/img5.png){:width="40%;" : .center-image}
+The result is `unwrap`, in fringes.
 
-2. Ensuite, aller dans **substract**. Deux solutions se présentent pour
-reconstruire la phase. Soit utiliser la référence expérimentale, soit générer une
-référence numérique à partir des estimations (interfrange et orientation des
-franges) données par le programme.
-![img6](images/img6.png)
-Pour la référence générée numériquement, ajuster les valeurs de l’interfrange
-et de l’angle d’orientation des franges. Pour le canal plasma, les deux valeurs
-sont optimisées en symétrisant le profil de déphasage, respectivement
-longitudinal et transverse.
+Carrier
+-------
 
-![img7](images/img7.png)
+The unwrapped phase still contains the carrier (the tilt of the unperturbed fringes): it is removed here.
 
-## Calcul de la densité
+- **Phase/2pi**: the unwrapped phase, and an **Offset** subtracted from the result.
+- Carrier: the interfringe [px], the angle [˚] and the weight used by the guess of the carrier: the peak of
+  |FFT|·r<sup>w</sup> in the region, r the frequency and w the weight (w < 0 prefers the low frequencies, w > 0 the
+  high ones). Changing the weight guesses again. With the check box the subtraction is updated at each change of the
+  values: adjust them until the phase is flat (or symmetric) where there is no object.
+- Reference: subtracts the unwrapped phase of a reference interferogram (same size) instead of the carrier.
+- **Subtract**: the result is `No carrier` or `Ref removed`, in fringes.
 
-1. **Ouvrir Analysis/ Inversions**. Sélectionner la carte de phase dont la référence a
-été soustraite. Elle est dans la Winlist sous le nom de **no carrier**.
-![img8](images/img8.png)
-
-2. Un axe apparaît sur la carte de phase. Placer les points définissant l’axe un à
-un afin de définir l’axe de symétrie du profil. La commande « Cmd + V »
-permet d’observer la coupe transverse. « Cmd + A » permet de rajouter des
-points.
-![img9](images/img9.png)
-
-3. Configurer les paramètres suivants :\\
-![img10](images/img10.png)
-
-Sélectionner **plasma**, puis **Calculate**. La carte de densité calculée est dans la **Winlist**
-sous le nom de **Abel** et illustrée ci-dessus. Les valeurs de densité sont en electrons/m^3.
-
-4. Itérer pour affiner la définition de l'axe de symetrie.
-
-5. Exporter les données sous fichier texte en allant dans **File/Export**.
+The phase is then ready for the **Integral inversion** pan (with the phase in fringes).
