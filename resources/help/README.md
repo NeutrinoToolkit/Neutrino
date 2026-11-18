@@ -96,3 +96,5 @@ The `neutrino` module (`pip install neutrino-toolkit`) opens Neutrino windows fr
 numpy arrays and the tools driven by script: `win.openPan("Find_peaks")`, then `pan.set(name, value)`,
 `pan.button(name)`... with the names of the widgets (<img src="../icons/gearPy.png" width="16" /> → **Show widget
 names**, or **Copy as Python** for all the values of a tool).
+
+The full description is on the page [Python](PythonREADME.html).

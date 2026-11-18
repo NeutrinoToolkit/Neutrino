@@ -1431,6 +1431,12 @@ void neutrino::closeEvent (QCloseEvent *e) {
     if (fileClose()) {
         saveDefaults();
         e->accept();
+        // the help is a window of its own: it would keep the application open after the last Neutrino window
+        bool others=false;
+        for (auto &neu : nCore::self()->neus()) {
+            if (neu!=this && neu->isVisible()) others=true;
+        }
+        if (!others) nHelp::closeHelp();
     } else {
         e->ignore();
         connect(my_view, &nView::mouseposition, this, &neutrino::mouseposition);

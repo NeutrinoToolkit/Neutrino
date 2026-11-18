@@ -48,6 +48,8 @@ public:
     static nHelp* showPage(const QString &page=QString(), neutrino *window=nullptr);
     // the resource of the help of a plugin (empty if it has none)
     static QString pageFile(const QString &page);
+    // closes the help (if open): when the last Neutrino window is closed
+    static void closeHelp();
 
 protected:
     void closeEvent(QCloseEvent *e) override;

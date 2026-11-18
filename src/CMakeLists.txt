@@ -227,14 +227,27 @@ if(PANDOC)
     set(HELP_HTML ${CMAKE_CURRENT_BINARY_DIR}/NeutrinoREADME.html)
     set(HELP_QRC ${QRCDIR}/neutrinoHelp.qrc)
     set_source_files_properties(${HELP_DIR}/README.md PROPERTIES HEADER_FILE_ONLY TRUE)
-    file(CONFIGURE OUTPUT ${HELP_QRC} CONTENT "<RCC>\n    <qresource>\n        <file alias=\"NeutrinoREADME.html\">${HELP_HTML}</file>\n    </qresource>\n</RCC>" @ONLY)
+    # file(CONFIGURE OUTPUT ${HELP_QRC} CONTENT "<RCC>\n    <qresource>\n        <file alias=\"NeutrinoREADME.html\">${HELP_HTML}</file>\n    </qresource>\n</RCC>" @ONLY)
+    # also the page of the python module (python/README.md -> PythonREADME.html), also in the application
+    set(PYTHON_HELP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../python)
+    set(PYTHON_HELP_HTML ${CMAKE_CURRENT_BINARY_DIR}/PythonREADME.html)
+    set_source_files_properties(${PYTHON_HELP_DIR}/README.md PROPERTIES HEADER_FILE_ONLY TRUE)
+    file(CONFIGURE OUTPUT ${HELP_QRC} CONTENT "<RCC>\n    <qresource>\n        <file alias=\"NeutrinoREADME.html\">${HELP_HTML}</file>\n        <file alias=\"PythonREADME.html\">${PYTHON_HELP_HTML}</file>\n    </qresource>\n</RCC>" @ONLY)
     add_custom_command(
         OUTPUT ${HELP_HTML}
         COMMAND ${PANDOC} --metadata title="Neutrino" -V fontsize=14 -s README.md ${PANDOC_EMBED_ARGS} -o ${HELP_HTML}
         MAIN_DEPENDENCY ${HELP_DIR}/README.md
         WORKING_DIRECTORY ${HELP_DIR}
         )
-    add_custom_target(pandocNeutrino ALL DEPENDS ${HELP_HTML} SOURCES ${HELP_DIR}/README.md)
+    # (the page has its own title: only the title of the html)
+    add_custom_command(
+        OUTPUT ${PYTHON_HELP_HTML}
+        COMMAND ${PANDOC} --metadata pagetitle=Python -V fontsize=14 -s README.md ${PANDOC_EMBED_ARGS} -o ${PYTHON_HELP_HTML}
+        MAIN_DEPENDENCY ${PYTHON_HELP_DIR}/README.md
+        WORKING_DIRECTORY ${PYTHON_HELP_DIR}
+        )
+    # add_custom_target(pandocNeutrino ALL DEPENDS ${HELP_HTML} SOURCES ${HELP_DIR}/README.md)
+    add_custom_target(pandocNeutrino ALL DEPENDS ${HELP_HTML} ${PYTHON_HELP_HTML} SOURCES ${HELP_DIR}/README.md ${PYTHON_HELP_DIR}/README.md)
 endif()
 
 # sub-structure (wrong: we should probably replicate CMakeLists.txt in every subfolder)

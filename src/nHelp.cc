@@ -42,6 +42,8 @@ QPointer<nHelp> nHelp::instance;
 QPointer<neutrino> nHelp::window_shortcuts;
 
 static const QString generalPage(":/NeutrinoREADME.html");
+// the python module (python/README.md)
+static const QString pythonPage(":/PythonREADME.html");
 // made by the program, not a resource (it was the plugin Shortcuts)
 static const QString shortcutsPage(":/help/keyboard_shortcuts.html");
 
@@ -164,6 +166,10 @@ nHelp* nHelp::showPage(const QString &page, neutrino *window) {
     return instance;
 }
 
+void nHelp::closeHelp() {
+    if (instance) instance->close();
+}
+
 nHelp::nHelp() : QMainWindow(nullptr) {
     setAttribute(Qt::WA_DeleteOnClose);
     Ui::PanHelp my_help; // the toolbar and the browser of the help of the pans
@@ -236,6 +242,7 @@ void nHelp::fillPages() {
 
     if (QFileInfo::exists(generalPage)) addPage(new QTreeWidgetItem(tree), "Neutrino", generalPage);
     addPage(new QTreeWidgetItem(tree), tr("Keyboard shortcuts"), shortcutsPage);
+    if (QFileInfo::exists(pythonPage)) addPage(new QTreeWidgetItem(tree), "Python", pythonPage);
 
     QMap<QString, QTreeWidgetItem*> menus;
     auto menuItem=[this, &menus](QString entry) {
