@@ -500,7 +500,7 @@
               <string>K </string>
              </property>
              <property name="maximum">
-              <number>9</number>
+              <number>99</number>
              </property>
              <property name="neutrinoSave" stdset="0">
               <bool>true</bool>
