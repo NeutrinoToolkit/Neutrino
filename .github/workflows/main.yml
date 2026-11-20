@@ -193,7 +193,7 @@ jobs:
     timeout-minutes: 120
     runs-on: macos-15-intel
     env:
-      PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qttools fftw-3 gsl cfitsio hdf5 hdf4 tiff pandoc python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig librsvg
+      PORTS: qt6-qtbase qt6-qtsvg qt6-qtmultimedia qt6-qttools fftw-3 gsl cfitsio hdf5 hdf4 tiff python313 py313-pip libomp boost vulkan-headers zlib cmake pkgconfig librsvg
     steps:
     - uses: actions/checkout@v7
       with:
@@ -206,6 +206,15 @@ jobs:
         echo /opt/local/sbin >> $GITHUB_PATH
         sudo /opt/local/bin/port -N selfupdate
         sudo /opt/local/bin/port -N install $PORTS
+    # pandoc of MacPorts is built locally when its archive is missing (ghc, failed after 17 min): the official binary
+    - name: Pandoc
+      run: |
+        curl -sSL -o pandoc.zip https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-x86_64-macOS.zip
+        echo "5495af2c548bd49fe00c28a7f6dadaa1348e6338b92368d3d6e29fd3e16061d1  pandoc.zip" | shasum -a 256 -c -
+        unzip -q pandoc.zip -d $HOME
+        rm pandoc.zip
+        echo $HOME/pandoc-3.7.0.2-x86_64/bin >> $GITHUB_PATH
+        $HOME/pandoc-3.7.0.2-x86_64/bin/pandoc --version | head -1
     - name: Build
       run: |
         mkdir -p build && cd build
@@ -367,6 +376,12 @@ jobs:
     # Windows: cl, link and the Windows SDK in the environment (used by clang-cl)
     - uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
+    # the STL of MSVC >= 14.52 needs clang >= 22 (error STL1000), the runner has LLVM 20: the latest LLVM for clang-cl
+    - name: LLVM
+      if: runner.os == 'Windows'
+      run: |
+        choco upgrade llvm -y --no-progress
+        clang-cl --version
     # restore and save apart: the cache is kept also when the build fails
     - name: vcpkg cache
       if: runner.os == 'Windows'
