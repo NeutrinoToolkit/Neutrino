@@ -98,6 +98,8 @@ public:
 
     // thread stuff
     panThread nThread;
+    // runThread is running (the pan handles events meanwhile): the steps of a pan triggered then should not run
+    bool inRunThread=false;
 
     QPointer<QMainWindow> helpwin;
     QPointer<QWidget> widgetNames; // the overlay of showWidgetNames

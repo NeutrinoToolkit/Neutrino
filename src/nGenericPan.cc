@@ -865,6 +865,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
     // the progress is in the status bar of the pan, with a Stop button: a modal dialog took the focus (e.g. from the
     // main window while moving a line with auto update). The pan is disabled meanwhile, as the dialog did, except
     // its status bar; the main window stays usable (the calculations work on copies of the images)
+    inRunThread=true;
     bool canceled=false;
     QProgressBar *bar=nullptr;
     QToolButton *stop=nullptr;
@@ -879,9 +880,13 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
         statusBar()->addPermanentWidget(bar,1);
         statusBar()->addPermanentWidget(stop);
     }
+    // guarded pointers: disabling a widget takes the focus from a spin box being edited, which commits its value
+    // (valueChanged) and can run slots of the pan that delete some of these widgets (crash in isEnabled)
     QList<QPointer<QWidget>> disabled;
-    for (auto &w : findChildren<QWidget *>(Qt::FindDirectChildrenOnly)) {
-        if (w!=statusBar() && w->isEnabled()) {
+    QList<QPointer<QWidget>> children;
+    for (auto &w : findChildren<QWidget *>(Qt::FindDirectChildrenOnly)) children << w;
+    for (auto &w : children) {
+        if (w && w!=statusBar() && w->isEnabled()) {
             w->setEnabled(false);
             disabled << w;
         }
@@ -909,6 +914,7 @@ nGenericPan::runThread(void *iparams, ifunc my_func, QString title, int max_calc
     for (auto &w : disabled) {
         if (w) w->setEnabled(true);
     }
+    inRunThread=false;
     if (!canceled && nThread.n_iter==0) {
         QMessageBox::critical(this, tr("Thread problems"),nThread.err_message,QMessageBox::Ok);
     }

@@ -39,9 +39,6 @@ Wavelet
 - **Damp**: length of the filter across the fringes, in interfringes. A long filter is selective (less noise, about
   1/(π·damp) of relative mismatch of interfringe accepted) but smooths the steep gradients of the phase; a short one
   follows them but is noisier and lets the background of the image leak into the fringes.
-- **K**: regularization of the interfringe and the angle: each pixel keeps its K best filters and takes the one
-  nearest to the interfringe and angle maps smoothed over the neighbours (weighted by the contrast), against isolated
-  wrong choices in the noisy regions. 0: off (the best filter of each pixel).
 - **log λ**: the interfringes of the scan are spaced geometrically (the same relative step everywhere), otherwise
   linearly.
 - **thick**: half width of the filter along the fringes (pixels, or carrier interfringes with **Rel. to carrier**).

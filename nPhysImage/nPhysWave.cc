@@ -115,16 +115,6 @@ static physD wavelet_pad(physD &fdata, double window, vec2i &offset) {
     const double mean=fdata.sum()/fdata.getSurf();
     physD padded(newSize.x(), newSize.y(), mean);
     padded.set_origin(fdata.get_origin()+offset);
-//     auto taper=[pad](int d) { return d<=0 ? 1.0 : (d>=pad ? 0.0 : 0.5*(1.0+cos(M_PI*d/pad))); };
-// #pragma omp parallel for
-//     for (int j=0; j<newSize.y(); j++) {
-//         for (int i=0; i<newSize.x(); i++) {
-//             int x=i-offset.x(), y=j-offset.y();
-//             int cx=std::clamp(x,0,W-1), cy=std::clamp(y,0,H-1);
-//             double t=taper(std::abs(x-cx))*taper(std::abs(y-cy));
-//             padded.set(i,j,mean+(fdata.point(cx,cy)-mean)*t);
-//         }
-//     }
     // (the border pixels extended along the normal and faded to the mean: for oblique fringes they make false
     // fringes in the padding, which biased the phase near the borders and even inside, 10x worse than the plain
     // mean in the tests: the step to the mean has a broad spectrum, weak at the carrier)
@@ -149,8 +139,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         params.olist.clear();
 
-        // unsigned int dx=params.data->getW();
-        // unsigned int dy=params.data->getH();
         // computed on the padded image, the results cropped back to the image at the end
         const unsigned int dx0=params.data->getW();
         const unsigned int dy0=params.data->getH();
@@ -192,10 +180,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         fftw_complex *Ftmorlet = fftw_alloc_complex(surf);
 
         fftw_plan plan_fwd = fftw_plan_dft_2d(dy, dx, t, Ft, FFTW_FORWARD, FFTW_ESTIMATE);
-        // fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, FFTW_ESTIMATE);
-        // the backward FFT runs once per filter: a measured plan is 1.3-3x faster (much more with fftw threads).
-        // Measuring costs about one second for a large image but FFTW keeps it (wisdom): the next plans of the same
-        // size are immediate, also with FFTW_ESTIMATE. FFTW_MEASURE overwrites t and Ftmorlet: plan before filling t
         size_t n_filters = params.n_angles*params.n_lambdas;
         fftw_plan plan_bwd = fftw_plan_dft_2d(dy, dx, t, Ftmorlet, FFTW_BACKWARD, n_filters >= 16 ? FFTW_MEASURE : FFTW_ESTIMATE);
 
@@ -230,12 +214,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         std::vector<float> nearLambda(2*surf, -1), nearAngle(2*surf, -1); // [0..surf) minus, [surf..2surf) plus
         std::vector<int> bestL(surf,-1), bestA(surf,-1);
 
-        // regularization (wavelet_params::n_candidates): the K best filters of each pixel (response, phase, indices)
-        const size_t K = params.n_candidates>=2 ? params.n_candidates : 0;
-        std::vector<float> candQ(K*surf, -1), candPh(K*surf, 0);
-        std::vector<short> candL(K*surf, -1), candA(K*surf, -1);
-
-
         for (size_t o=0; o<nOuter; o++) {
             for (size_t n=0; n<nInner; n++) {
                 size_t i = anglesInner ? o : n; // lambda index
@@ -259,29 +237,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                 double thick_norm=params.thick*M_PI;
                 double lambda_norm=lambdas[i];
 
-// #pragma omp parallel for
-//                     for (unsigned int k=0;k<surf;k++) {
-//                         unsigned int x=k%dx;
-//                         unsigned int y=k/dx;
-//
-//                         int xx=(x+(dx+1)/2)%dx-(dx+1)/2;
-//                         int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
-//
-//                         double fx = xx/(double)dx;
-//                         double fy = yy/(double)dy;
-//                         double xr = fx*cr - fy*sr; //rotate
-//                         double yr = fx*sr + fy*cr;
-//
-//                         double e_x = -pow(damp_norm*(xr*lambda_norm-1.0), 2.);
-//                         double e_y = -pow(yr*thick_norm, 2.);
-//
-//                         // double gauss = exp(e_x)*exp(e_y);
-//                         double gauss = norm_adm*(exp(e_x)-kappa*exp(-pow(damp_norm*xr*lambda_norm, 2.)))*exp(e_y);
-//
-//                         t[k][0]=Ft[k][0]*gauss;
-//                         t[k][1]=Ft[k][1]*gauss;
-//
-//                     }
 #pragma omp parallel for
                 for (unsigned int y=0;y<dy;y++) {
                     int yy=(y+(dy+1)/2)%dy-(dy+1)/2;
@@ -329,16 +284,6 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
                         nearAngle[surf+k] = -1;
                     }
                     prevRow[n*surf+k]=qmap_local;
-                    if (K) { // replaces the weakest of the K candidates
-                        size_t kmin=k*K;
-                        for (size_t c=k*K+1; c<(k+1)*K; c++) if (candQ[c]<candQ[kmin]) kmin=c;
-                        if (qmap_local>candQ[kmin]) {
-                            candQ[kmin]=qmap_local;
-                            candPh[kmin]=atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
-                            candL[kmin]=i;
-                            candA[kmin]=j;
-                        }
-                    }
                 }
 
             }
@@ -357,56 +302,7 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
         if ((*params.iter_ptr)!=-1) {
 
-            double dLambda = lambdas.size()>1 ? (lambdas.back()-lambdas.front())/(lambdas.size()-1) : 0;
             double dAngle = angles.size()>1 ? (angles.back()-angles.front())/(angles.size()-1) : 0;
-
-            // regularization: lambda and angle of the best filters smoothed over the neighbours (weighted by the
-            // contrast; the angle as 2*angle: 0 and 180 are the same fringes), then each pixel takes the candidate
-            // nearest to them (distance in steps of the scan). Without refinement for a candidate that is not the best
-            if (K && (dLambda!=0 || dAngle!=0)) {
-                physD wl(dx, dy, 0.0, "wl"), w(dx, dy, 0.0, "w"), wc(dx, dy, 0.0, "wc"), ws(dx, dy, 0.0, "ws");
-                std::vector<double> lam;
-                for (size_t k=0; k<surf; k++) {
-                    if (!(qmap->Timg_buffer[k]>0) || bestL[k]<0) continue;
-                    double q=sqrt(qmap->Timg_buffer[k]), a2=2*angles[bestA[k]]*_phys_deg;
-                    wl.Timg_buffer[k]=q*lambdas[bestL[k]];
-                    w.Timg_buffer[k]=q;
-                    wc.Timg_buffer[k]=q*cos(a2);
-                    ws.Timg_buffer[k]=q*sin(a2);
-                    lam.push_back(lambdas[bestL[k]]);
-                }
-                if (lam.size()) {
-                    auto med=lam.begin()+lam.size()/2;
-                    std::nth_element(lam.begin(), med, lam.end());
-                    double sigma=*med; // one interfringe
-                    for (auto *img : {&wl, &w, &wc, &ws}) physMath::phys_fast_gaussian_blur(*img, sigma);
-#pragma omp parallel for
-                    for (size_t k=0; k<surf; k++) {
-                        if (!(w.Timg_buffer[k]>0) || bestL[k]<0) continue;
-                        double lamS=wl.Timg_buffer[k]/w.Timg_buffer[k];
-                        double angS=0.5*atan2(ws.Timg_buffer[k], wc.Timg_buffer[k])/_phys_deg;
-                        size_t cbest=k*K;
-                        double dbest=std::numeric_limits<double>::infinity();
-                        bool found=false;
-                        for (size_t c=k*K; c<(k+1)*K; c++) {
-                            if (candQ[c]<0) continue;
-                            double dl = dLambda==0 ? 0 : wavelet_log_lambda(params) ?
-                                        log(lambdas[candL[c]]/lamS)/log(pow(lambdas.back()/lambdas.front(), 1.0/(lambdas.size()-1))) :
-                                        (lambdas[candL[c]]-lamS)/dLambda;
-                            double da = dAngle!=0 ? remainder(angles[candA[c]]-angS, 180.0)/dAngle : 0;
-                            double d=dl*dl+da*da;
-                            if (d<dbest || (d==dbest && candQ[c]>candQ[cbest])) { dbest=d; cbest=c; found=true; }
-                        }
-                        if (found && (candL[cbest]!=bestL[k] || candA[cbest]!=bestA[k])) {
-                            qmap->Timg_buffer[k]=candQ[cbest];
-                            wphase->Timg_buffer[k]=candPh[cbest];
-                            lambda->Timg_buffer[k]=lambdas[candL[cbest]];
-                            angle->Timg_buffer[k]=angles[candA[cbest]];
-                                nearLambda[k]=nearLambda[surf+k]=nearAngle[k]=nearAngle[surf+k]=-1;
-                        }
-                    }
-                }
-            }
 
 #pragma omp parallel for
             // for (size_t k=0; k<params.data->getSurf(); k++) {

@@ -60,6 +60,12 @@ Interferometry::Interferometry(neutrino *nparent) : nGenericPan(nparent) {
             }
         }
         connect(my_image[k].doit, &QToolButton::released, this, qOverload<>(&Interferometry::doWavelet));
+        // the 180 deg scan has no min and max
+        auto *ui=&my_image[k];
+        connect(ui->angle180, &QCheckBox::toggled, this, [ui](bool on) {
+            ui->minAngle->setEnabled(!on);
+            ui->maxAngle->setEnabled(!on);
+        });
     }
 
     show();
@@ -216,7 +222,9 @@ void Interferometry::bufferChanged(nPhysD* buf) {
 }
 
 void Interferometry::guessCarrier() {
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     nPhysD *image=getPhysFromCombo(my_image[0].image);
     if (image) {
         QRect geom2=region->getRect(image);
@@ -240,7 +248,9 @@ void Interferometry::guessCarrier() {
 }
 
 void Interferometry::doWavelet () {
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     QElapsedTimer timer;
     timer.start();
     nThread.n_iter=0; // runThread sets it to -1 only if a wavelet below is stopped
@@ -270,6 +280,11 @@ void Interferometry::doWavelet (int iimage) {
             my_params.init_angle=angleCarrier->value();
             my_params.end_angle=angleCarrier->value();
             my_params.n_angles=1;
+        } else if (my_image[iimage].angle180->isChecked()) {
+            // n angles over 180 deg from -90 (step 180/n): -90 and 90 are the same orientation, computed only once
+            my_params.n_angles=my_image[iimage].numAngle->value();
+            my_params.init_angle=angleCarrier->value() + (my_params.n_angles>1 ? -90.0 : 0.0);
+            my_params.end_angle=my_params.init_angle + 180.0*(my_params.n_angles-1)/my_params.n_angles;
         } else {
             my_params.init_angle=my_image[iimage].minAngle->value()+angleCarrier->value();
             my_params.end_angle=my_image[iimage].maxAngle->value()+angleCarrier->value();
@@ -317,8 +332,8 @@ void Interferometry::doWavelet (int iimage) {
 
         int niter=my_params.n_angles*my_params.n_lambdas+1;
 
-        my_params.n_candidates=candidates->value();
-        my_params.log_lambda=logLambda->isChecked();
+        // my_params.log_lambda=logLambda->isChecked();
+        my_params.log_lambda=my_image[iimage].logLambda->isChecked(); // (per image)
         runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet"+QString(suffix.c_str()), niter);
         if (nThread.n_iter==-1) {
             my_params.data=nullptr;
@@ -356,7 +371,9 @@ void Interferometry::doWavelet (int iimage) {
 }
 
 void Interferometry::doUnwrap () {
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     statusbar->showMessage("Unwrapping");
     if (getLocal("phase_2pi_shot")) {
         nPhysD diff=getLocal("phase_2pi_shot")->copy();
@@ -400,13 +417,16 @@ void Interferometry::doUnwrap () {
         // qDebug() << "here";
         if (qual && phase) {
             physD loc_qual(*qual);
-            double mini=loc_qual.get_min();
-            double maxi=loc_qual.get_max();
-            double valDouble=mini+cutoffValue->value()*(maxi-mini)/100.0;
-#pragma omp parallel for
-            for (size_t k=0; k<loc_qual.getSurf(); k++)
-                if (loc_qual.Timg_buffer[k] < valDouble)
-                    loc_qual.Timg_buffer[k]=0.0;
+            // the quality cutoff is a mask of the result (Blur, mask & quality cutoff, doMaskCutoff): applied here too
+            // it made the unwrap work on a quality with holes (Goldstein: cuts; Miguel+Quality and Quality: the pixels
+            // set to 0 joined in an arbitrary order) and the unwrap depend on the cutoff
+//            double mini=loc_qual.get_min();
+//            double maxi=loc_qual.get_max();
+//            double valDouble=mini+cutoffValue->value()*(maxi-mini)/100.0;
+//#pragma omp parallel for
+//            for (size_t k=0; k<loc_qual.getSurf(); k++)
+//                if (loc_qual.Timg_buffer[k] < valDouble)
+//                    loc_qual.Timg_buffer[k]=0.0;
             // qDebug() << "here";
             physD unwrap;
 
@@ -460,126 +480,147 @@ void Interferometry::doUnwrap () {
             if (unwrapAngles->isChecked() && haveAngles) {
                 // where the best filter points opposite to the (unwrapped) fringe direction, the phase of the SHOT changes sign:
                 // flip the shot phase there, then subtract the reference (flipping the difference is wrong by 2*phase_ref)
-                physD angle = (static_cast<physD*>(getLocal("angle_shot")))->copy();
-                physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
-                physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
-                doPhaseUnwrap(angle, unwrapAngle);
+                // the flips of the phase of one wavelet (flipped in place) from its angle map; returns the flip map (0/1)
+                auto flipByAngles=[&](const physD &angleImg, physD &flipped) {
+                    physD angle = angleImg.copy();
+                    physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
+                    physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
+                    // doPhaseUnwrap(angle, unwrapAngle);
+                    // the angle map unwrapped always by its own reliability (Miguel, with the barrier): with the method and
+                    // the quality of the phase the flips changed with the method, the quality and the K regularization
+                    // (the contrast measures the phase, the smoothness of the angle map its own reliability)
+                    physWave::phys_phase_unwrap(angle, barrierPhys, physWave::MIGUEL_QUALITY, unwrapAngle);
 
-                physD shotFlipped = (static_cast<physD*>(getLocal("phase_2pi_shot")))->copy();
-                for (size_t k=0; k<unwrapAngle.getSurf(); k++) {
-                    const double dAngle=unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k];
-                    // round: unwrapped values are not exact integers away; NaN: no flip (lround(NaN) is undefined)
-                    long swaps=std::isfinite(dAngle) ? std::lround(dAngle) : 0;
-                    if (std::abs(swaps) % 2 == 1) {
-                        shotFlipped.Timg_buffer[k] = -shotFlipped.Timg_buffer[k];
-                        unwrapAngle.Timg_buffer[k]=1;
-                    } else {
-                        unwrapAngle.Timg_buffer[k]=0;
+                    for (size_t k=0; k<unwrapAngle.getSurf(); k++) {
+                        const double dAngle=unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k];
+                        // round: unwrapped values are not exact integers away; NaN: no flip (lround(NaN) is undefined)
+                        long swaps=std::isfinite(dAngle) ? std::lround(dAngle) : 0;
+                        if (std::abs(swaps) % 2 == 1) {
+                            flipped.Timg_buffer[k] = -flipped.Timg_buffer[k];
+                            unwrapAngle.Timg_buffer[k]=1;
+                        } else {
+                            unwrapAngle.Timg_buffer[k]=0;
+                        }
                     }
-                }
+
+                    // the angle map has no true residues (around the extrema of a smooth phase the direction turns by 360 deg)
+                    // but its noise does: a cut of its unwrap through a clean region flips a whole region by mistake, and
+                    // there flipped shot - ref is -(shot+ref), the carrier at double frequency. With the right flips the
+                    // flipped shot is continuous across the borders of the regions of the flip map, with the wrong one it
+                    // jumps by 2 phase: starting from the largest region, each region keeps the sign of its shot that gives
+                    // the smaller sum of the jumps across its borders with the regions already decided.
+                    // (not the smoothness inside the region: where the fringe direction is truly reversed |grad phase|
+                    // is larger than the carrier and the wrong sign gives the smoother shot-ref)
+                    {
+                        const size_t dx=flipped.getW(), dy=flipped.getH();
+                        auto wrapped=[](double v) { return v-std::round(v); };
+                        // regions: 4-connected, same flip
+                        std::vector<int> label(dx*dy,-1);
+                        std::vector<size_t> regionSize, stack;
+                        for (size_t k0=0; k0<dx*dy; k0++) {
+                            if (label[k0]>=0) continue;
+                            const int lab=regionSize.size();
+                            const double val=unwrapAngle.Timg_buffer[k0];
+                            size_t size=0;
+                            stack.assign(1,k0);
+                            label[k0]=lab;
+                            while (!stack.empty()) {
+                                const size_t k=stack.back(); stack.pop_back();
+                                size++;
+                                const size_t i=k%dx, j=k/dx;
+                                for (size_t n : {i>0 ? k-1 : k, i+1<dx ? k+1 : k, j>0 ? k-dx : k, j+1<dy ? k+dx : k}) {
+                                    if (n!=k && label[n]<0 && unwrapAngle.Timg_buffer[n]==val) {
+                                        label[n]=lab;
+                                        stack.push_back(n);
+                                    }
+                                }
+                            }
+                            regionSize.push_back(size);
+                        }
+                        const size_t nRegions=regionSize.size();
+                        // borders: for each pair of regions the sums of the jumps with the same and the opposite sign
+                        struct Border { double same=0, opposite=0; };
+                        std::vector<std::map<int,Border>> borders(nRegions);
+                        auto addBorder=[&](size_t k, size_t n) {
+                            if (label[k]==label[n]) return;
+                            const double a=flipped.Timg_buffer[k], b=flipped.Timg_buffer[n];
+                            if (!std::isfinite(a) || !std::isfinite(b)) return;
+                            const double same=std::abs(wrapped(a-b)), opposite=std::abs(wrapped(a+b));
+                            Border &bk=borders[label[k]][label[n]], &bn=borders[label[n]][label[k]];
+                            bk.same+=same; bk.opposite+=opposite;
+                            bn.same+=same; bn.opposite+=opposite;
+                        };
+                        for (size_t j=0; j<dy; j++) {
+                            for (size_t i=0; i<dx; i++) {
+                                const size_t k=i+j*dx;
+                                if (i+1<dx) addBorder(k,k+1);
+                                if (j+1<dy) addBorder(k,k+dx);
+                            }
+                        }
+                        // grow from the largest region: next the undecided region with the longest evidence (sum of the
+                        // jumps of both signs) towards the decided ones; toggle[r]: the sign of the region changes
+                        std::vector<int> toggle(nRegions,-1); // -1 undecided
+                        std::vector<double> costKeep(nRegions,0), costToggle(nRegions,0);
+                        std::priority_queue<std::pair<double,int>> queue;
+                        auto decide=[&](int r, bool t) {
+                            toggle[r]=t;
+                            for (auto &[n,b] : borders[r]) {
+                                if (toggle[n]>=0) continue;
+                                // n keeps its sign: the jump is "same" if r kept it, "opposite" if r was toggled
+                                costKeep[n]   += t ? b.opposite : b.same;
+                                costToggle[n] += t ? b.same : b.opposite;
+                                queue.push({costKeep[n]+costToggle[n],n});
+                            }
+                        };
+                        int nToggled=0;
+                        std::vector<int> bySize(nRegions);
+                        std::iota(bySize.begin(),bySize.end(),0);
+                        std::sort(bySize.begin(),bySize.end(),[&](int a, int b) { return regionSize[a]>regionSize[b]; });
+                        for (int seed : bySize) { // (one seed per group of regions with no border between them)
+                            if (toggle[seed]>=0) continue;
+                            decide(seed,false);
+                            while (!queue.empty()) {
+                                const int r=queue.top().second; queue.pop();
+                                if (toggle[r]>=0) continue;
+                                const bool t=costToggle[r]<costKeep[r];
+                                nToggled+=t;
+                                decide(r,t);
+                            }
+                        }
+                        for (size_t k=0; k<dx*dy; k++) {
+                            if (toggle[label[k]]==1) {
+                                flipped.Timg_buffer[k]=-flipped.Timg_buffer[k];
+                                unwrapAngle.Timg_buffer[k]=1-unwrapAngle.Timg_buffer[k];
+                            }
+                        }
+                        DEBUG("unwrap angles: " << nToggled << " of " << nRegions << " regions toggled");
+                            (void)nToggled; // (DEBUG is empty in release)
+                    }
+                    return unwrapAngle;
+                };
+
+                // shot and reference flipped separately, then subtracted (a reference with an angle scan can flip
+                // too: with only the shot flipped the difference was shot+ref there)
+                physD shotFlipped = (static_cast<physD*>(getLocal("phase_2pi_shot")))->copy();
+                physD unwrapAngle = flipByAngles(*static_cast<physD*>(getLocal("angle_shot")), shotFlipped);
 
                 // reference phase: the reference wavelet or the carrier
                 physD refPhase;
+                bool refIsImage=false;
                 if ( !getLocal("phase_2pi_ref") || getPhysFromCombo(my_image[0].image) == getPhysFromCombo(my_image[1].image)) {
                     refPhase = physD(shotFlipped.getW(),shotFlipped.getH(),0.0);
                     physWave::phys_subtract_carrier(refPhase, angleCarrier->value(), widthCarrier->value());
                     physMath::phys_multiply(refPhase,-1.0);
                 } else {
                     refPhase = static_cast<physD*>(getLocal("phase_2pi_ref"))->copy();
+                    refIsImage = true;
                 }
 
-                // the angle map has no true residues (around the extrema of a smooth phase the direction turns by 360 deg)
-                // but its noise does: a cut of its unwrap through a clean region flips a whole region by mistake, and
-                // there flipped shot - ref is -(shot+ref), the carrier at double frequency. With the right flips the
-                // flipped shot is continuous across the borders of the regions of the flip map, with the wrong one it
-                // jumps by 2 phase: starting from the largest region, each region keeps the sign of its shot that gives
-                // the smaller sum of the jumps across its borders with the regions already decided.
-                // (not the smoothness inside the region: where the fringe direction is truly reversed |grad phase|
-                // is larger than the carrier and the wrong sign gives the smoother shot-ref)
-                {
-                    const size_t dx=shotFlipped.getW(), dy=shotFlipped.getH();
-                    auto wrapped=[](double v) { return v-std::round(v); };
-                    // regions: 4-connected, same flip
-                    std::vector<int> label(dx*dy,-1);
-                    std::vector<size_t> regionSize, stack;
-                    for (size_t k0=0; k0<dx*dy; k0++) {
-                        if (label[k0]>=0) continue;
-                        const int lab=regionSize.size();
-                        const double val=unwrapAngle.Timg_buffer[k0];
-                        size_t size=0;
-                        stack.assign(1,k0);
-                        label[k0]=lab;
-                        while (!stack.empty()) {
-                            const size_t k=stack.back(); stack.pop_back();
-                            size++;
-                            const size_t i=k%dx, j=k/dx;
-                            for (size_t n : {i>0 ? k-1 : k, i+1<dx ? k+1 : k, j>0 ? k-dx : k, j+1<dy ? k+dx : k}) {
-                                if (n!=k && label[n]<0 && unwrapAngle.Timg_buffer[n]==val) {
-                                    label[n]=lab;
-                                    stack.push_back(n);
-                                }
-                            }
-                        }
-                        regionSize.push_back(size);
-                    }
-                    const size_t nRegions=regionSize.size();
-                    // borders: for each pair of regions the sums of the jumps with the same and the opposite sign
-                    struct Border { double same=0, opposite=0; };
-                    std::vector<std::map<int,Border>> borders(nRegions);
-                    auto addBorder=[&](size_t k, size_t n) {
-                        if (label[k]==label[n]) return;
-                        const double a=shotFlipped.Timg_buffer[k], b=shotFlipped.Timg_buffer[n];
-                        if (!std::isfinite(a) || !std::isfinite(b)) return;
-                        const double same=std::abs(wrapped(a-b)), opposite=std::abs(wrapped(a+b));
-                        Border &bk=borders[label[k]][label[n]], &bn=borders[label[n]][label[k]];
-                        bk.same+=same; bk.opposite+=opposite;
-                        bn.same+=same; bn.opposite+=opposite;
-                    };
-                    for (size_t j=0; j<dy; j++) {
-                        for (size_t i=0; i<dx; i++) {
-                            const size_t k=i+j*dx;
-                            if (i+1<dx) addBorder(k,k+1);
-                            if (j+1<dy) addBorder(k,k+dx);
-                        }
-                    }
-                    // grow from the largest region: next the undecided region with the longest evidence (sum of the
-                    // jumps of both signs) towards the decided ones; toggle[r]: the sign of the region changes
-                    std::vector<int> toggle(nRegions,-1); // -1 undecided
-                    std::vector<double> costKeep(nRegions,0), costToggle(nRegions,0);
-                    std::priority_queue<std::pair<double,int>> queue;
-                    auto decide=[&](int r, bool t) {
-                        toggle[r]=t;
-                        for (auto &[n,b] : borders[r]) {
-                            if (toggle[n]>=0) continue;
-                            // n keeps its sign: the jump is "same" if r kept it, "opposite" if r was toggled
-                            costKeep[n]   += t ? b.opposite : b.same;
-                            costToggle[n] += t ? b.same : b.opposite;
-                            queue.push({costKeep[n]+costToggle[n],n});
-                        }
-                    };
-                    int nToggled=0;
-                    std::vector<int> bySize(nRegions);
-                    std::iota(bySize.begin(),bySize.end(),0);
-                    std::sort(bySize.begin(),bySize.end(),[&](int a, int b) { return regionSize[a]>regionSize[b]; });
-                    for (int seed : bySize) { // (one seed per group of regions with no border between them)
-                        if (toggle[seed]>=0) continue;
-                        decide(seed,false);
-                        while (!queue.empty()) {
-                            const int r=queue.top().second; queue.pop();
-                            if (toggle[r]>=0) continue;
-                            const bool t=costToggle[r]<costKeep[r];
-                            nToggled+=t;
-                            decide(r,t);
-                        }
-                    }
-                    for (size_t k=0; k<dx*dy; k++) {
-                        if (toggle[label[k]]==1) {
-                            shotFlipped.Timg_buffer[k]=-shotFlipped.Timg_buffer[k];
-                            unwrapAngle.Timg_buffer[k]=1-unwrapAngle.Timg_buffer[k];
-                        }
-                    }
-                    DEBUG("unwrap angles: " << nToggled << " of " << nRegions << " regions toggled");
-                    (void)nToggled; // (DEBUG is empty in release)
+                physD unwrapAngleRef;
+                const bool refAngles = refIsImage && my_image[0].numAngle->value()>0 && nPhysExists(getLocal("angle_ref"))
+                        && getLocal("angle_ref")->getW()==refPhase.getW() && getLocal("angle_ref")->getH()==refPhase.getH();
+                if (refAngles) {
+                    unwrapAngleRef = flipByAngles(*static_cast<physD*>(getLocal("angle_ref")), refPhase);
                 }
 
                 // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
@@ -607,6 +648,18 @@ void Interferometry::doUnwrap () {
                 localPhys["unwrap_angles"]=nparent->replacePhys(new nPhysD(unwrapAngle),getLocal("unwrap_angles"));
                 phase2.setShortName(minus ? "phase2 (shot-ref)" : "phase2 (shot+ref)");
                 localPhys["phase2"]=nparent->replacePhys(new nPhysD(phase2),getLocal("phase2"));
+                // the phases of the wavelets with the sign flipped (phase_2pi_shot and phase_2pi_ref are not changed)
+                shotFlipped.TscanBrightness();
+                shotFlipped.setShortName("phase_2pi_shot_flipped");
+                localPhys["phase_2pi_shot_flipped"]=nparent->replacePhys(new nPhysD(shotFlipped),getLocal("phase_2pi_shot_flipped"));
+                if (refAngles) {
+                    refPhase.TscanBrightness();
+                    refPhase.setShortName("phase_2pi_ref_flipped");
+                    localPhys["phase_2pi_ref_flipped"]=nparent->replacePhys(new nPhysD(refPhase),getLocal("phase_2pi_ref_flipped"));
+                    unwrapAngleRef.TscanBrightness();
+                    unwrapAngleRef.setShortName("unwrap angles_ref");
+                    localPhys["unwrap_angles_ref"]=nparent->replacePhys(new nPhysD(unwrapAngleRef),getLocal("unwrap_angles_ref"));
+                }
             } else {
                 doPhaseUnwrap(phase2, unwrap);
             }
@@ -662,7 +715,9 @@ void Interferometry::doUnwrap () {
 }
 
 void Interferometry::doSubtract () {
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     statusbar->showMessage("Subtract and rotate");
 
     if (getLocal("intensity_ref") && getLocal("intensity_shot")) {
@@ -727,7 +782,9 @@ void Interferometry::doSubtract () {
 
 
 void Interferometry::doMaskCutoff() {
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     statusbar->showMessage("Mask");
     nPhysD *phase=getLocal("phase_2pi");
     nPhysD *phaseMask=nullptr;
@@ -789,7 +846,9 @@ void Interferometry::doMaskCutoff() {
 }
 
 void Interferometry::doShape(){
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     statusbar->showMessage("Interpolating");
 
     nPhysD *image=getLocal("phaseMask");
@@ -966,7 +1025,9 @@ void Interferometry::removeShape(QObject *obj){
 }
 
 void Interferometry::doCutoff(){
-    if (inLoop) return; // triggered while the interpolation loop handles events (doShape)
+    // triggered while the interpolation loop (doShape) or a wavelet (runThread) handles events: e.g. a spin box
+    // being edited commits its value when runThread disables the pan (the chain after the wavelet uses it)
+    if (inLoop || inRunThread) return;
     statusbar->showMessage("Cutoff");
     // the result of doShape when it did something (interpolation)
     nPhysD *image=useInterpolate->isChecked() ? getLocal("interpPhase_2piMask") : getLocal("phaseMask");
@@ -1052,6 +1113,11 @@ void Interferometry::loadSettings(QSettings &settings){
     settings.endGroup();
 
     nGenericPan::loadSettings(settings);
+
+    // log lambda was one for both images (sessions and preferences saved before it was per image)
+    if (settings.contains("logLambda") && !settings.contains("logLambda"+panName()+"0")) {
+        for (auto &ui : my_image) ui.logLambda->setChecked(settings.value("logLambda").toBool());
+    }
 
     for (const auto& one : property("NeuSave-localPhysNames").toStringList()) {
         std::string onestring=one.toStdString();

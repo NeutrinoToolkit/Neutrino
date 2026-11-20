@@ -178,7 +178,6 @@ void Wavelet::doWavelet () {
         my_params.damp=damp->value();
         my_params.data=&datamatrix;
 
-        my_params.n_candidates=candidates->value();
         my_params.log_lambda=logLambda->isChecked();
         runThread(&my_params, physWave::phys_wavelet_trasl_cpu, "Wavelet", my_params.n_angles*my_params.n_lambdas);
 

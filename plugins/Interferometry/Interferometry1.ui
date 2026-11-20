@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>201</width>
+    <width>241</width>
     <height>101</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="1,0,1,0">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0" columnstretch="1,0,1,0,0">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -98,17 +98,6 @@
         </property>
         <property name="neutrinoImage" stdset="0">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="doit">
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../resources/icons/icons.qrc">
-          <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
         </property>
        </widget>
       </item>
@@ -225,7 +214,7 @@
       <string>:</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -240,7 +229,57 @@
       <string>:</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QCheckBox" name="logLambda">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Interfringe values spaced geometrically (the same relative step everywhere: the filter accepts a relative mismatch, about 20% for damp 1), otherwise linearly (a wide range had a coarse step for the dense fringes: lower contrast and phase errors between the values)</string>
+     </property>
+     <property name="text">
+      <string>log λ</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="neutrinoSave" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4">
+    <widget class="QCheckBox" name="angle180">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>The angles scanned over 180˚ around the carrier, from -90˚ in steps of 180˚/number, without min and max: the two ends of a scan from -90˚ to 90˚ are the same orientation (two filters pointing the opposite way, conjugate phases) and with them the same angle is computed twice</string>
+     </property>
+     <property name="text">
+      <string>180˚</string>
+     </property>
+     <property name="neutrinoSave" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4">
+    <widget class="QToolButton" name="doit">
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/icons/run.png</normaloff>:/icons/run.png</iconset>
      </property>
     </widget>
    </item>
@@ -248,16 +287,15 @@
  </widget>
  <tabstops>
   <tabstop>image</tabstop>
-  <tabstop>doit</tabstop>
   <tabstop>minStretch</tabstop>
   <tabstop>maxStretch</tabstop>
   <tabstop>numStretch</tabstop>
   <tabstop>minAngle</tabstop>
   <tabstop>maxAngle</tabstop>
   <tabstop>numAngle</tabstop>
+  <tabstop>logLambda</tabstop>
+  <tabstop>angle180</tabstop>
  </tabstops>
- <resources>
-  <include location="../../resources/icons/icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -74,10 +74,6 @@ public:
 
     double damp;
 
-    // regularization of lambda and angle (0: off, the filter of largest response of each pixel):
-    // each pixel keeps its n_candidates best filters, then chooses the one nearest to the lambda and angle maps
-    // smoothed over the neighbours (weighted by the contrast)
-    size_t n_candidates=0;
 
 
 	int iter;

@@ -35,11 +35,6 @@ Main interfringe
   window is selective in interfringe and angle (less noise) but smooths the steep gradients of the phase.
 - **Pad**: the image around the region (2 analysis windows on each side, inside the image) is used in the
   computation: less error at the borders of the region.
-- **K**: regularization of the interfringe and the angle: each pixel keeps its K best filters and takes the one
-  nearest to the interfringe and angle maps smoothed over the neighbours (weighted by the contrast), against the
-  isolated wrong choices of the filter in the noisy regions. 0: off (the best filter of each pixel).
-- **log λ**: the interfringes of the scan are spaced geometrically (the same relative step everywhere), otherwise
-  linearly.
 
 Reference and Shot
 ------------------
@@ -47,7 +42,12 @@ Reference and Shot
 Each tab sets the image and its scan of the wavelet, around the carrier:
 
 - Angle min : max [˚] and number: the orientations, relative to the carrier. Number 0: the carrier only.
+- **180˚**: the orientations all around, the number of angles over 180˚ from -90˚ (steps of 180˚/number), and min and
+  max are not used. A scan from -90˚ to 90˚ computes the same orientation twice at its ends (with two filters pointing
+  the opposite way): with 180˚ every angle is a different one.
 - Stretch min : max and number: the interfringes, in units of the carrier interfringe. Number 0: the carrier only.
+- **log λ**: the interfringes of the scan are spaced geometrically (the same relative step everywhere), otherwise
+  linearly.
 - **...**: the wavelet of this image only (without the following steps).
 
 The scan should cover the interfringes and orientations of the fringes in the region: a small range for the
@@ -70,8 +70,12 @@ The quality of the phase, `phase_quality`, is √(contrast<sub>shot</sub>·contr
 - **Miguel**, **Miguel+Quality**: sorting by reliability (Herráez et al.), without or with the quality.
 - **Quality**: flood fill guided by the quality, the best pixels first.
 - **angle**: where the fringes turn by more than 90˚, the best filter can point in the opposite direction, which
-  flips the sign of the phase. The angle of the shot is unwrapped and the phase of the shot flipped where needed
-  (images `unwrap angles` and `phase2`).
+  flips the sign of the phase. The angle map of the shot is unwrapped and the phase of the shot flipped where needed,
+  and the same for the reference if it has an angle scan; then they are subtracted. Images: the flip map
+  `unwrap angles`, the flipped phase `phase_2pi_shot_flipped` (`phase_2pi_shot` is the phase of the wavelet), the
+  flipped difference `phase2`; with an angle scan of the reference also `unwrap angles_ref` and
+  `phase_2pi_ref_flipped`. The angle map is unwrapped by its own reliability (Miguel), whatever the method and the
+  quality chosen for the phase.
 - Barrier (check box and **...**): a line that the unwrap does not cross (e.g. the edge of a target). Not for the
   Simple methods.
 
@@ -92,7 +96,8 @@ Blur, mask & quality cutoff
 
 - Blur [px]: gaussian blur of the phase (0: off), before the mask.
 - Mask (check box and **...**): only the phase inside the closed line is kept, 0 outside.
-- Quality cutoff [%]: the pixels of quality below this fraction of its range (from min to max) are set to 0.
+- Quality cutoff [%]: the pixels of quality below this fraction of its range (from min to max) are set to 0. Only
+  a mask of the result: the unwrap uses the whole quality.
 
 The result is `phaseMask`.
 

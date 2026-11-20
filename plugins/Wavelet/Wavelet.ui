@@ -492,22 +492,6 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QSpinBox" name="candidates">
-             <property name="toolTip">
-              <string>Regularization of interfringe and angle: each pixel keeps its K best filters and takes the one nearest to the interfringe and angle maps smoothed over the neighbours (weighted by the contrast). 0: off (the best filter of each pixel)</string>
-             </property>
-             <property name="prefix">
-              <string>K </string>
-             </property>
-             <property name="maximum">
-              <number>99</number>
-             </property>
-             <property name="neutrinoSave" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
             <widget class="QCheckBox" name="logLambda">
              <property name="toolTip">
               <string>Interfringe values spaced geometrically (the same relative step everywhere: the filter accepts a relative mismatch, about 20% for damp 1), otherwise linearly (a wide range had a coarse step for the dense fringes: lower contrast and phase errors between the values)</string>
@@ -523,7 +507,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
+           <item row="0" column="2">
             <widget class="QDoubleSpinBox" name="thick">
              <property name="toolTip">
               <string>Thickness: half width (1/e) of the analysis window along the fringes (px, or times the carrier interfringe with Rel. to carrier). Longer averages more noise away but is biased where the fringes bend. 0: the interfringe of the carrier</string>
