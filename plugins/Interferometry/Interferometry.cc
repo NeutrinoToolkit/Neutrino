@@ -28,6 +28,7 @@
 #include <map>
 #include <queue>
 #include <numeric>
+#include <algorithm>
 
 // physWavelets
 
@@ -481,7 +482,8 @@ void Interferometry::doUnwrap () {
                 // where the best filter points opposite to the (unwrapped) fringe direction, the phase of the SHOT changes sign:
                 // flip the shot phase there, then subtract the reference (flipping the difference is wrong by 2*phase_ref)
                 // the flips of the phase of one wavelet (flipped in place) from its angle map; returns the flip map (0/1)
-                auto flipByAngles=[&](const physD &angleImg, physD &flipped) {
+                // and in angleUnwrap the unwrapped angle map in degrees, consistent with the flips
+                auto flipByAngles=[&](const physD &angleImg, physD &flipped, physD &angleUnwrap) {
                     physD angle = angleImg.copy();
                     physMath::phys_divide(angle,180); // the fringe direction has a period of 180 deg
                     physD unwrapAngle = physD(angle.getW(),angle.getH(),0);
@@ -490,6 +492,9 @@ void Interferometry::doUnwrap () {
                     // the quality of the phase the flips changed with the method, the quality and the K regularization
                     // (the contrast measures the phase, the smoothness of the angle map its own reliability)
                     physWave::phys_phase_unwrap(angle, barrierPhys, physWave::MIGUEL_QUALITY, unwrapAngle);
+                    // the unwrapped angle in degrees (corrected below with the flips changed by the region step)
+                    angleUnwrap = unwrapAngle.copy();
+                    physMath::phys_multiply(angleUnwrap,180.0);
 
                     for (size_t k=0; k<unwrapAngle.getSurf(); k++) {
                         const double dAngle=unwrapAngle.Timg_buffer[k]-angle.Timg_buffer[k];
@@ -539,10 +544,17 @@ void Interferometry::doUnwrap () {
                         }
                         const size_t nRegions=regionSize.size();
                         // borders: for each pair of regions the sums of the jumps with the same and the opposite sign
-                        struct Border { double same=0, opposite=0; };
+                        // (and the sum of the jumps of the unwrapped angle, from this region to the other one)
+                        struct Border { double same=0, opposite=0, angleJump=0; size_t angleCount=0; };
                         std::vector<std::map<int,Border>> borders(nRegions);
                         auto addBorder=[&](size_t k, size_t n) {
                             if (label[k]==label[n]) return;
+                            const double ak=angleUnwrap.Timg_buffer[k], an=angleUnwrap.Timg_buffer[n];
+                            if (std::isfinite(ak) && std::isfinite(an)) {
+                                Border &bk=borders[label[k]][label[n]], &bn=borders[label[n]][label[k]];
+                                bk.angleJump+=an-ak; bk.angleCount++;
+                                bn.angleJump+=ak-an; bn.angleCount++;
+                            }
                             const double a=flipped.Timg_buffer[k], b=flipped.Timg_buffer[n];
                             if (!std::isfinite(a) || !std::isfinite(b)) return;
                             const double same=std::abs(wrapped(a-b)), opposite=std::abs(wrapped(a+b));
@@ -562,8 +574,10 @@ void Interferometry::doUnwrap () {
                         std::vector<int> toggle(nRegions,-1); // -1 undecided
                         std::vector<double> costKeep(nRegions,0), costToggle(nRegions,0);
                         std::priority_queue<std::pair<double,int>> queue;
+                        std::vector<int> order; // of the decisions
                         auto decide=[&](int r, bool t) {
                             toggle[r]=t;
+                            order.push_back(r);
                             for (auto &[n,b] : borders[r]) {
                                 if (toggle[n]>=0) continue;
                                 // n keeps its sign: the jump is "same" if r kept it, "opposite" if r was toggled
@@ -587,10 +601,25 @@ void Interferometry::doUnwrap () {
                                 decide(r,t);
                             }
                         }
+                        // the unwrapped angle of a toggled region is wrong by an odd multiple of 180 deg: +-180, the
+                        // sign towards its neighbours already shifted (in the order of the decisions)
+                        std::vector<double> angleShift(nRegions,0);
+                        std::vector<char> shifted(nRegions,0);
+                        for (int r : order) {
+                            if (toggle[r]==1) {
+                                double jump=0; // sum of the jumps towards the neighbours, after their shifts
+                                for (auto &[n,b] : borders[r]) {
+                                    if (shifted[n]) jump+=b.angleJump+b.angleCount*angleShift[n];
+                                }
+                                angleShift[r] = jump>=0 ? 180.0 : -180.0;
+                            }
+                            shifted[r]=1;
+                        }
                         for (size_t k=0; k<dx*dy; k++) {
                             if (toggle[label[k]]==1) {
                                 flipped.Timg_buffer[k]=-flipped.Timg_buffer[k];
                                 unwrapAngle.Timg_buffer[k]=1-unwrapAngle.Timg_buffer[k];
+                                angleUnwrap.Timg_buffer[k]+=angleShift[label[k]];
                             }
                         }
                         DEBUG("unwrap angles: " << nToggled << " of " << nRegions << " regions toggled");
@@ -602,7 +631,8 @@ void Interferometry::doUnwrap () {
                 // shot and reference flipped separately, then subtracted (a reference with an angle scan can flip
                 // too: with only the shot flipped the difference was shot+ref there)
                 physD shotFlipped = (static_cast<physD*>(getLocal("phase_2pi_shot")))->copy();
-                physD unwrapAngle = flipByAngles(*static_cast<physD*>(getLocal("angle_shot")), shotFlipped);
+                physD angleUnwrapShot, angleUnwrapRef;
+                physD unwrapAngle = flipByAngles(*static_cast<physD*>(getLocal("angle_shot")), shotFlipped, angleUnwrapShot);
 
                 // reference phase: the reference wavelet or the carrier
                 physD refPhase;
@@ -620,7 +650,7 @@ void Interferometry::doUnwrap () {
                 const bool refAngles = refIsImage && my_image[0].numAngle->value()>0 && nPhysExists(getLocal("angle_ref"))
                         && getLocal("angle_ref")->getW()==refPhase.getW() && getLocal("angle_ref")->getH()==refPhase.getH();
                 if (refAngles) {
-                    unwrapAngleRef = flipByAngles(*static_cast<physD*>(getLocal("angle_ref")), refPhase);
+                    unwrapAngleRef = flipByAngles(*static_cast<physD*>(getLocal("angle_ref")), refPhase, angleUnwrapRef);
                 }
 
                 // the orientation of the whole unwrapped angle map is arbitrary: try shot-ref and shot+ref
@@ -641,6 +671,25 @@ void Interferometry::doUnwrap () {
                 phase2.set_scale(phase->get_scale());
                 unwrap.set_origin(phase->get_origin());
                 unwrap.set_scale(phase->get_scale());
+
+                // the unwrapped angle maps: the multiple of 180 deg of the whole map is arbitrary. With shot+ref the
+                // flipped shot has the opposite sign of the reference: its direction is the opposite one (+180). Then
+                // moved by turns of 360 (the flips stay the same) to have its median near the carrier
+                auto showAngleUnwrap=[&](physD &a, double offset, const std::string &name) {
+                    std::vector<double> values;
+                    for (size_t k=0; k<a.getSurf(); k++) if (std::isfinite(a.Timg_buffer[k])) values.push_back(a.Timg_buffer[k]+offset);
+                    if (values.size()) {
+                        auto med=values.begin()+values.size()/2;
+                        std::nth_element(values.begin(), med, values.end());
+                        offset+=360.0*std::round((angleCarrier->value()-*med)/360.0);
+                    }
+                    physMath::phys_add(a,offset);
+                    a.TscanBrightness();
+                    a.setShortName(name);
+                    localPhys[name]=nparent->replacePhys(new nPhysD(a),getLocal(name));
+                };
+                showAngleUnwrap(angleUnwrapShot, minus ? 0.0 : 180.0, "angle_shot_unwrap");
+                if (refAngles) showAngleUnwrap(angleUnwrapRef, 0.0, "angle_ref_unwrap");
 
                 phase2.TscanBrightness();
                 unwrapAngle.TscanBrightness();

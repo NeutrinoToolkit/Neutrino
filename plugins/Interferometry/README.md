@@ -73,9 +73,10 @@ The quality of the phase, `phase_quality`, is √(contrast<sub>shot</sub>·contr
   flips the sign of the phase. The angle map of the shot is unwrapped and the phase of the shot flipped where needed,
   and the same for the reference if it has an angle scan; then they are subtracted. Images: the flip map
   `unwrap angles`, the flipped phase `phase_2pi_shot_flipped` (`phase_2pi_shot` is the phase of the wavelet), the
-  flipped difference `phase2`; with an angle scan of the reference also `unwrap angles_ref` and
-  `phase_2pi_ref_flipped`. The angle map is unwrapped by its own reliability (Miguel), whatever the method and the
-  quality chosen for the phase.
+  flipped difference `phase2`, and the unwrapped orientation of the fringes `angle_shot_unwrap` (degrees, no more
+  limited to the scan: 180˚ more where the phase is flipped, its median within 180˚ of the carrier); with an angle
+  scan of the reference also `unwrap angles_ref`, `phase_2pi_ref_flipped` and `angle_ref_unwrap`. The angle map
+  is unwrapped by its own reliability (Miguel), whatever the method and the quality chosen for the phase.
 - Barrier (check box and **...**): a line that the unwrap does not cross (e.g. the edge of a target). Not for the
   Simple methods.
 

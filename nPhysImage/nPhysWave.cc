@@ -30,8 +30,11 @@
  * @{
  */
 
-// sub-step position of the maximum of the filter response: parabola on log|z|^2 through the best filter
-// and its two neighbours (in units of the scan step, within +-0.5). Values <=0 mean "no neighbour" -> 0
+// sub-step position of the maximum of the filter response, in steps of the scan from the best filter: the vertex of
+// the parabola through the responses |z|^2 of the previous filter (ym), the best one (y0) and the next one (yp), on
+// their log (the filter is a gaussian in frequency: the log of its response to clean fringes is a parabola).
+// 0 if a response is missing (<=0: the best filter is at an end of the scan) or without a maximum; within +-0.5
+// (further, a neighbour would have been the best)
 static double wavelet_parabolic_offset(double ym, double y0, double yp) {
     if (ym<=0 || y0<=0 || yp<=0) return 0;
     ym=log(ym);
@@ -203,16 +206,28 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
         double log_negligible = -50.0 - log(norm_adm);
         double log_kappa = damp_norm>0 ? -damp_norm*damp_norm : -std::numeric_limits<double>::infinity();
 
-        // refinement of lambda and angle maps: for each pixel keep the response of the filters next to the best one
-        // (lambda-1, lambda+1, angle-1, angle+1). The previous responses are kept for one row
-        // of the inner scan, which is the shorter one between angles and lambdas
+        // Refinement of the lambda and angle maps (between the values of the scan).
+        // The scan is a grid of filters (lambda index i, angle index j): each pixel keeps the filter of largest
+        // response |z|^2, the best one (bestL, bestA). Its lambda and angle are then refined with a parabola through
+        // the responses of the best filter and of its neighbours in the grid (wavelet_parabolic_offset): along lambda
+        // (i-1, i+1) and along angle (j-1, j+1), separately. To fit it each pixel needs these four responses:
+        // - before the best (i-1 or j-1): computed earlier in the scan. When a filter becomes the best they are
+        //   copied from lastResp, the most recent response of each filter of the inner loop.
+        // - after the best (i+1 or j+1): computed later. Stored when computed, if the pixel's best is still the
+        //   filter just before them.
+        // A new best resets the four. -1: no response (the best is at an end of the scan): no refinement there.
+        // The scan is two loops, the inner one on the shorter axis (angles or lambdas), so that lastResp keeps only
+        // one response per inner index: for inner index n, lastResp holds the current outer row up to n and the
+        // previous outer row after n, which is enough for the two neighbours before the best.
         bool anglesInner = angles.size() <= lambdas.size();
         size_t nInner = anglesInner ? angles.size() : lambdas.size();
         size_t nOuter = anglesInner ? lambdas.size() : angles.size();
-        auto rowIdx = [&](size_t il, size_t ia) { return anglesInner ? ia : il; };
-        std::vector<float> prevRow(nInner*surf, -1);
-        std::vector<float> nearLambda(2*surf, -1), nearAngle(2*surf, -1); // [0..surf) minus, [surf..2surf) plus
-        std::vector<int> bestL(surf,-1), bestA(surf,-1);
+        auto innerIdx = [&](size_t il, size_t ia) { return anglesInner ? ia : il; }; // index of the filter (il, ia) in the inner loop
+        std::vector<float> lastResp(nInner*surf, -1); // [inner index * surf + pixel]
+        // responses of the neighbours of the best filter of each pixel
+        std::vector<float> respLambdaPrev(surf, -1), respLambdaNext(surf, -1); // filters (i-1, j) and (i+1, j)
+        std::vector<float> respAnglePrev(surf, -1), respAngleNext(surf, -1);   // filters (i, j-1) and (i, j+1)
+        std::vector<int> bestL(surf,-1), bestA(surf,-1); // indices of the best filter of each pixel
 
         for (size_t o=0; o<nOuter; o++) {
             for (size_t n=0; n<nInner; n++) {
@@ -265,25 +280,27 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 
                 fftw_execute(plan_bwd);
 
-                // decision
+                // decision: the best filter of each pixel, and the responses of its neighbours
 #pragma omp parallel for
                 for (size_t k=0; k<surf; k++) {
-                    double qmap_local=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
-                    if (bestA[k]==(int)j && bestL[k]+1==(int)i) nearLambda[surf+k]=qmap_local;
-                    if (bestL[k]==(int)i && bestA[k]+1==(int)j) nearAngle[surf+k]=qmap_local;
-                    if ( qmap_local > qmap->Timg_buffer[k]) {
-                        qmap->Timg_buffer[k] = qmap_local;
+                    double resp=pow(Ftmorlet[k][0],2)+pow(Ftmorlet[k][1],2);
+                    // this filter is the neighbour after the best one (computed after it)
+                    if (bestA[k]==(int)j && bestL[k]+1==(int)i) respLambdaNext[k]=resp;
+                    if (bestL[k]==(int)i && bestA[k]+1==(int)j) respAngleNext[k]=resp;
+                    if (resp > qmap->Timg_buffer[k]) { // a new best filter
+                        qmap->Timg_buffer[k] = resp;
                         wphase->Timg_buffer[k] = atan2(Ftmorlet[k][1], Ftmorlet[k][0]);
                         lambda->Timg_buffer[k] = lambdas[i];
                         angle->Timg_buffer[k] = angles[j];
                         bestL[k]=i;
                         bestA[k]=j;
-                        nearLambda[k] = i>0 ? prevRow[rowIdx(i-1,j)*surf+k] : -1;
-                        nearAngle[k]  = j>0 ? prevRow[rowIdx(i,j-1)*surf+k] : -1;
-                        nearLambda[surf+k] = -1;
-                        nearAngle[surf+k] = -1;
+                        // its neighbours before it (already computed), the ones after it are still to come
+                        respLambdaPrev[k] = i>0 ? lastResp[innerIdx(i-1,j)*surf+k] : -1;
+                        respAnglePrev[k]  = j>0 ? lastResp[innerIdx(i,j-1)*surf+k] : -1;
+                        respLambdaNext[k] = -1;
+                        respAngleNext[k]  = -1;
                     }
-                    prevRow[n*surf+k]=qmap_local;
+                    lastResp[n*surf+k]=resp;
                 }
 
             }
@@ -307,8 +324,12 @@ void physWave::phys_wavelet_field_2D_morlet(wavelet_params &params)
 #pragma omp parallel for
             // for (size_t k=0; k<params.data->getSurf(); k++) {
             for (size_t k=0; k<surf; k++) { // padded
-                lambda->Timg_buffer[k] = wavelet_lambda_step(params, lambdas, lambda->Timg_buffer[k], wavelet_parabolic_offset(nearLambda[k], qmap->Timg_buffer[k], nearLambda[surf+k]));
-                angle->Timg_buffer[k] += dAngle*wavelet_parabolic_offset(nearAngle[k], qmap->Timg_buffer[k], nearAngle[surf+k]);
+                // refinement: the maximum of the parabola through the best filter and its neighbours, in steps of the
+                // scan (within +-0.5; 0 at the ends of the scan). A step of lambda is a ratio for a geometric scan
+                const double offsetLambda=wavelet_parabolic_offset(respLambdaPrev[k], qmap->Timg_buffer[k], respLambdaNext[k]);
+                const double offsetAngle =wavelet_parabolic_offset(respAnglePrev[k],  qmap->Timg_buffer[k], respAngleNext[k]);
+                lambda->Timg_buffer[k] = wavelet_lambda_step(params, lambdas, lambda->Timg_buffer[k], offsetLambda);
+                angle->Timg_buffer[k] += dAngle*offsetAngle;
                 qmap->Timg_buffer[k]=sqrt(qmap->Timg_buffer[k])/surf;
                 // intensity->Timg_buffer[k] = params.data->Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]);
                 intensity->Timg_buffer[k] = fdata.Timg_buffer[k] - 2.0 * qmap->Timg_buffer[k]*cos(wphase->Timg_buffer[k]); // NaN would spread in the blur

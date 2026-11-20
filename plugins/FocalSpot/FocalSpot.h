@@ -54,15 +54,15 @@ public:
 public slots:
     void calculate_stats();
 
-    void bufferChanged(nPhysD*);
+    void bufferChanged(nPhysD*) override;
 
     void setPosZero(QPointF pos);
     void setOriginToCentre();
 
     void mouseAtPlot(QMouseEvent*);
-    void mouseAtWorld(QPointF);
+    void mouseAtWorld(QPointF) override;
 
-    void loadSettings(QString=QString());
+    void loadSettings(QString=QString()) override;
 
     void on_actionClipboard_triggered();
     void on_actionTxt_triggered();
